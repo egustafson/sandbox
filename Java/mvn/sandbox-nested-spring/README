@@ -1,0 +1,28 @@
+This Maven project demonstrates how to use Spring and nested contexts (bean 
+factories) to dynamically load "Provider" classes that then register there
+services with the global "Factory".  The pattern is based on the architecture
+of the Java Security plugins.  The key to this example is that it uses Spring's
+ability to have nested context/bean factories and loads each discovered plug-in
+in a separate, nested context under the application root context.
+
+Plugins are detected by looking for /providerContext.xml in the class path.  For
+each detected file the file is feed to a new GenericApplicationContext.  The 
+library project (JAR) has a dependency on the application project (JAR), but
+the application does not need to know about the library.  The library JAR does
+need to be on the applications CLASSPATH at run-time.  Additionally, a "Provider"
+can be embedded in the application project (JAR) which could contain the "core"
+set of services.  The local, application providerContext.xml is loaded in exactly
+the same way as all other plugins and has no special privilege.
+
+To use run this example in Eclipse:
+
+  1) Load both child projects into Eclipse.
+  2) Create an execution (Run) configuration for the class org.elfwerks.sandbox
+      .nested.app.Main in sandbox-nested-application
+  3) Add the sandbox-nested-library project directly to the Classpath in the
+       Run configuration.  The library is NOT a Maven dependency, nor should it
+       be.
+  4) Run the application.
+  
+EG - 1/24/2008
+ 

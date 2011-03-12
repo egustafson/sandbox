@@ -1,0 +1,11 @@
+module org { 
+    module elfwerks {
+        module sandbox {
+            module servant { 
+                interface PingService {
+                    void ping();
+                };
+            };
+        };
+    };
+};

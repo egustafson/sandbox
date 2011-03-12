@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" 
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+
+  <display-name>sandbox jsp</display-name>
+  <servlet>
+  	<description></description>
+  	<display-name>JSPSandboxServlet</display-name>
+  	<servlet-name>JSPSandboxServlet</servlet-name>
+  	<servlet-class>org.elfwerks.JSPSandboxServlet</servlet-class>
+  	<load-on-startup>999</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>JSPSandboxServlet</servlet-name>
+  	<url-pattern>/JSPSandboxServlet</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+    

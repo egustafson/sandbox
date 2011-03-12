@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- exampleBusinessObject is an ordinary spring bean (no ties to quartz or scheduling) -->
+  <bean id="exampleBusinessObject" class="org.elfwerks.sandbox.quartz.ExampleJobPerformingBean" />
+  
+  <!-- Quartz setup/config below -->
+  
+  <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <property name="targetObject" ref="exampleBusinessObject" />
+    <property name="targetMethod" value="doJob" />
+    <property name="concurrent" value="false" /> <!-- default is to allow concurrent jobs -->
+  </bean>  
+
+  <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    <property name="jobDetail" ref="jobDetail" />
+    <property name="startDelay" value="22000" /> <!-- 22 seconds -->
+    <property name="repeatInterval" value="50000" /> <!-- repeat every 30 seconds -->
+  </bean>
+
+  <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    <property name="jobDetail" ref="jobDetail" />
+    <!-- run every morning at 6 AM -->
+    <property name="cronExpression" value="5,20,35,50 * * * * ?" />
+  </bean>  
+  
+  <!-- THE Scheduler, auto instantiated through a spring factory bean -->
+  <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="configLocation" value="classpath:quartz.properties"/>
+    <property name="autoStartup" value="true"/>
+    <property name="triggers">
+      <list>
+        <ref bean="simpleTrigger"/>
+        <ref bean="cronTrigger"/>
+      </list>
+    </property>
+  </bean>  
+    
+</beans>

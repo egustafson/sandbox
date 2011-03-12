@@ -1,0 +1,30 @@
+/**
+ * Example, "simple" parser.
+ */
+options { STATIC = false; }
+ 
+PARSER_BEGIN(SimpleParser)
+package org.elfwerks.parsers.simple;
+
+public class SimpleParser {
+	
+};
+PARSER_END(SimpleParser)
+
+SKIP : { " " | "\t" | "\r" }
+TOKEN : { < NEWLINE: "\n" | "\r\n" > }
+TOKEN : { < NUMBER:  (["0"-"9"])+ > }
+
+int line() : 
+{
+	Token t;
+	int value;
+}
+{
+    t = <NUMBER> 
+    <NEWLINE>
+    { 
+    	value = Integer.parseInt(t.image);
+        return value;
+    }
+}

@@ -1,0 +1,107 @@
+/**
+ *  Melodeo 'magic' file parser.
+ */
+ 
+options { STATIC = false; }
+
+PARSER_BEGIN(MagicParser)
+package org.elfwerks.parsers.magic;
+
+public class MagicParser {
+	
+};
+PARSER_END(MagicParser)
+
+SKIP  : { " " | "\t" | "\r" }
+
+TOKEN : { < #DECIMAL: ("0")|(["1"-"9"](["0"-"9"])*) > }
+TOKEN : { < #OCTAL: "0"(["0"-"7"])+ > }
+TOKEN : { < #HEX: "0x"(["A"-"F","a"-"f","0"-"9"])+ > }
+TOKEN : { < NUMBER: <DECIMAL> | <OCTAL> | <HEX> > }
+
+TOKEN : { < LEVEL:  (">")* > }
+
+TOKEN : { < NUMSEARCHTYPE: "belong" | "beshort" | "byte" > }
+TOKEN : { < STRSEARCHTYPE: "string" > }
+
+TOKEN : { < STRINGTEST: (["A"-"Z","a"-"z","0"-"9"])+ > }
+
+
+
+TOKEN : { < CONTENTTYPE: "" > }
+
+int number() :
+{
+	Token t;
+	int value;
+}
+{
+	t = <NUMBER>
+	{
+		value = Integer.decode(t.image);
+		return value;
+	}
+}
+
+int level() : 
+{
+	Token t;
+	int lvl;
+}
+{
+	t = <LEVEL>
+	{
+		lvl = t.image.length();
+		return lvl;
+	}
+}
+
+int offset() :
+{
+	int off;
+}
+{
+	/* eventually indirect offsets will be supported */
+    off = number()
+	{
+		return off;
+	}
+}
+
+void str_search() :
+{
+	Token t;
+	String test;
+}
+{   
+	<STRSEARCHTYPE>
+	t = <STRINGTEST>
+	{
+		test = t.image;
+	}
+}
+
+void num_search() :
+{
+    Token t;
+    String search_type;
+    int mask = -1;
+    int test;
+}
+{
+    t = <NUMSEARCHTYPE>
+    {
+        search_type = t.image;
+    }
+    ( "&" mask = number() )?
+    
+    test = number()
+}
+
+void search() :
+{}
+{
+	str_search() | num_search()
+}
+
+

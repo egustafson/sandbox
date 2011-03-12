@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Oct 15, 2007 11:51:30 AM                                                        
+
+     sandbox-pom    
+     An ant build file that is intended to hold "extensions" to the Maven 
+     build process.
+                   
+     egustafson                                                                
+     ====================================================================== -->
+<project name="sandbox-pom" default="help">
+    <description>
+            An ant build file that is intended to hold "extensions" to the Maven
+    </description>
+
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="help" description="An ant build file to hold 'maven' extensions">
+        <echo>
+        	This build.xml file is not inteded to be use in a stand alone mode, 
+        	it holds supporting targets that are intended to be used from with in
+        	either the developer's IDE, or from Maven.
+        </echo>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="mvn-example-subtask">
+    	<echo>Message from the ant task 'mvn-example-subtask'</echo>
+    </target>
+
+</project>

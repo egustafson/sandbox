@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="1.2" 
+  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-facesconfig_1_2.xsd"> 
+
+  <managed-bean>
+    <managed-bean-name>person</managed-bean-name>
+    <managed-bean-class>org.elfwerks.Person</managed-bean-class>
+    <managed-bean-scope>session</managed-bean-scope>
+  </managed-bean>
+  <managed-bean>
+    <managed-bean-name>personHandler</managed-bean-name>
+    <managed-bean-class>org.elfwerks.PersonHandler</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+    <managed-property>
+      <property-name>person</property-name>
+      <value>#{person}</value>
+    </managed-property>
+  </managed-bean>
+</faces-config>

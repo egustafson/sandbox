@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://elfwerks.org/sandbox"
+    targetNamespace="http://elfwerks.org/sandbox">
+
+   
+  <xs:element name="document">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="foo" type="xs:string"/>
+        <xs:element name="bar" type="barType"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:decimal" use="required"/>
+    </xs:complexType>
+  </xs:element>
+   
+  <xs:complexType name="fooType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:Name"/>
+        <xs:attribute name="version" type="xs:int"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="barType">
+    <xs:sequence>
+      <xs:element name="value" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:Name"/>
+  </xs:complexType>
+  
+  <xs:complexType name="propertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:Name" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+</xs:schema>

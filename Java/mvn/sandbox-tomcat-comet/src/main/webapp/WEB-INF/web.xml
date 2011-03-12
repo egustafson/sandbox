@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+
+  <display-name>sandbox-tomcat-comet</display-name>
+
+  <servlet>
+    <servlet-name>CometDemoServlet</servlet-name>
+    <servlet-class>org.elfwerks.sandbox.webapp.CometDemoServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CometDemoServlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>

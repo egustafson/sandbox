@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Oct 15, 2007 2:34:32 PM                                                        
+
+     sandbox-jpa-mvn-support    
+     Ant scripts to support the sandbox-jpa project, both from with in the
+     developer IDE, and from Maven.
+                   
+     12/14/2007 egustafson - Cloaned from repo-tool build.xml.
+     03/04/2008 egustafson - Cloaned from serendipity build.xml.                                                                
+     ====================================================================== -->
+<project name="sandbox-jpa-mvn-support" default="help">
+
+	<!-- Load from build.properties (overriding values) -->
+	<property file="build.properties" />
+	
+	<!-- Defaults -->
+    <property name="datasource.driver" value="com.mysql.jdbc.Driver" />
+    <property name="datasource.url" value="jdbc:mysql://" />
+    <property name="datasource.host" value="localhost" />
+    <property name="datasource.port" value="3306" />
+    <property name="datasource.dbname" value="junit_sandbox_jpa" />
+    <property name="datasource.user" value="sandbox" />
+    <property name="datasource.password" value="developer" />
+	
+	<property name="datasource.db_init" value="testdata/sql/junit_schema.sql" />
+	<property name="datasource.db_seed" value="testdata/sql/junit_seed.sql" />
+
+    <description>
+            Ant scripts to support the Sandbox JPA project.
+    </description>
+
+    <!-- ================================= 
+          target: help              
+         ================================= -->
+    <target name="help" description="Ant scripts to support the Sandbox JPA project.">
+        <echo>
+  This Ant build file is not intended to be used to build the Sandbox JPA project.
+  This file contains supplimental scripts that may help the developer.
+
+  Available Targets:
+    - echo
+    - ping-db
+    - drop-junit-db     (drops the db volume)
+    - create-junit-db   (creates the db volume, no schema)
+    - schema-junit-db   (creates schema, no data)
+    - seed-junit-db     (adds test data)
+    	</echo>
+    </target>
+
+	<target name="echo" description="Echo the property configuration.">
+		<echo>
+		  datasource.driver=${datasource.driver}
+		  datasource.url=${datasource.url}
+		  datasource.host=${datasource.host}
+		  datasource.port=${datasource.port}
+		  datasource.dbname=${datasource.dbname}
+		  datasource.user=${datasource.user}
+		  datasource.password=${datasource.password}
+		  datasource.classpath=${datasource.classpath}
+		</echo>
+	</target>
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: ping-db                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="ping-db">
+        <sql driver="${datasource.driver}" 
+    	     url="${datasource.url}${datasource.host}:${datasource.port}/" 
+    	     userid="${datasource.user}" 
+    	     password="${datasource.password}" 
+    	     classpath="${datasource.classpath}"
+    	     caching="true">
+    	  select now();
+    	</sql>
+    </target>
+	
+	<target name="drop-junit-db">
+        <sql driver="${datasource.driver}" 
+             url="${datasource.url}${datasource.host}:${datasource.port}/" 
+             userid="${datasource.user}" 
+             password="${datasource.password}" 
+             classpath="${datasource.classpath}"
+             caching="true">
+          drop database if exists ${datasource.dbname};
+        </sql>
+	</target>
+	
+	<target name="create-junit-db">
+        <sql driver="${datasource.driver}" 
+             url="${datasource.url}${datasource.host}:${datasource.port}/" 
+             userid="${datasource.user}" 
+             password="${datasource.password}" 
+             classpath="${datasource.classpath}"
+             caching="true">
+          drop database if exists ${datasource.dbname};
+          create database ${datasource.dbname};
+        </sql>
+	</target>
+		
+	<target name="schema-junit-db" depends="create-junit-db">
+        <sql driver="${datasource.driver}" 
+             url="${datasource.url}${datasource.host}:${datasource.port}/${datasource.dbname}" 
+             userid="${datasource.user}" 
+             password="${datasource.password}" 
+             classpath="${datasource.classpath}"
+             caching="true"
+             src="${datasource.db_init}" />
+	</target>
+
+	<target name="seed-junit-db" depends="schema-junit-db">
+        <sql driver="${datasource.driver}" 
+             url="${datasource.url}${datasource.host}:${datasource.port}/${datasource.dbname}" 
+             userid="${datasource.user}" 
+             password="${datasource.password}" 
+             classpath="${datasource.classpath}"
+             caching="true"
+             src="${datasource.db_seed}" />
+	</target>
+	
+	<target name="initialize-junit-db" depends="seed-junit-db" />
+
+</project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+  <roles id="1" rolename="test-role"/>
+  <roles id="2" rolename="test-role-2"/>
+  
+  <users id="1" username="test-user" real_name="Test User"/>
+  <users id="2" username="test-user-2" real_name="Second Tester"/>
+  
+  <users_roles users_id="1" roles_id="1"/>
+</dataset>

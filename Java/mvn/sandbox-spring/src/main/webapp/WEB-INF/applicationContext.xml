@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+          
+  <context:component-scan base-package="org.elfwerks"/>
+       
+  <!-- =============== -->
+  <!-- Quartz Examples -->
+  <!-- =============== -->
+  <bean name="exampleJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.elfwerks.sandbox.quartz.ExampleJob"/>
+  </bean>
+  
+  <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    <property name="jobDetail" ref="exampleJob"/>
+    <!-- Run every minute at 21 seconds -->
+    <property name="cronExpression" value="21 * * * * ?" />
+  </bean>
+
+  <bean name="exampleSpringJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.elfwerks.sandbox.quartz.ExampleSpringJobBean"/>
+    <property name="jobDataAsMap">
+      <map>
+        <entry key="sleepMillis" value="100"/>
+      </map>
+    </property>
+  </bean>
+  
+  <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    <property name="jobDetail" ref="exampleSpringJob"/>
+    <property name="startDelay" value="10000"/>  <!-- 10 seconds -->
+    <property name="repeatInterval" value="23000"/> <!-- 23 seconds -->
+  </bean> 
+  
+  <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="triggers">
+      <list>
+        <ref bean="cronTrigger"/>
+        <ref bean="simpleTrigger"/>
+      </list>
+    </property>
+  </bean>
+  
+  <!-- end of Quartz Example(s) -->
+  <!-- ======================== -->
+       
+</beans>

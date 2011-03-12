@@ -1,0 +1,16 @@
+#
+# Junit DB Connection Parameters
+#
+#  (move this file to 'build.properties')
+# Uncomment and set the value as necessary.
+#
+
+#datasource.classpath=c:\\java\\libraries\\mysql-connector-java-5.0.7-bin.jar
+
+#datasource.driver=com.mysql.jdbc.Driver
+#datasource.url=jdbc:mysql://
+#datasource.host=localhost
+#datasource.port=3306
+#datasource.dbname=junit_sandbox_jpa
+#datasource.user=sandbox
+#datasource.password=developer

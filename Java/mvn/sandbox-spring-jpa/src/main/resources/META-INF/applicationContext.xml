@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+  <context:component-scan base-package="com.melodeo"/>
+  <context:annotation-config />
+  <tx:annotation-driven />
+  
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true"/>
+    <property name="locations">
+      <list> <!-- last file in the list wins -->
+        <value>classpath:sandbox-spring-jpa.properties</value>
+        <value>file:sandbox-spring-jpa.properties</value>
+      </list>
+    </property>
+    <property name="properties">
+      <value>
+        hibernate.hbm2ddl.auto=false 
+      </value>
+    </property>
+  </bean>
+  
+  <bean id="exampleTxBean" class="org.elfwerks.sandbox.springjpa.TxWorkerBean" scope="prototype"/>
+  
+  <!-- ====================================================================== -->
+  <!--                   JPA Spring Configuration                             -->
+  <!-- ====================================================================== -->
+
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="defaultTimeout" value="30"/>  <!-- appears to have no effect -->
+  </bean>
+
+  <!--  [Only MySQL, not HSQLDB, supports XA (JTA) Transactions] 
+  <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+    <property name="userTransaction">
+      <bean class="org.springframework.transaction.jta.JotmFactoryBean"/>
+    </property>
+  </bean>
+  -->
+  
+  
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="sandbox-persistence" />
+    <property name="dataSource" ref="dataSource" />
+    <property name="jpaProperties">
+      <value>hibernate.hbm2ddl.auto=update</value>
+    </property>
+  </bean>
+
+  <bean id="entityManagerFactorySecond" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="persistenceUnitName" value="sandbox-second-persistence" />
+    <property name="dataSource" ref="dataSource" />
+    <property name="jpaProperties">
+      <value>hibernate.hbm2ddl.auto=update</value>
+    </property>
+  </bean>
+
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="${org.elfwerks.dataSource.driverClassName}"/>
+    <property name="url" value="${org.elfwerks.dataSource.url}"/>
+    <property name="username" value="${org.elfwerks.dataSource.username}"/>
+    <property name="password" value="${org.elfwerks.dataSource.password}"/>
+  </bean>
+
+</beans>

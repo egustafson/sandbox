@@ -1,0 +1,9 @@
+<html>
+<body>
+<h3>HTML Email</h3>
+<hr noshade="noshade"/>
+<div>
+  The message is:  ${greeting}
+</div>
+</body>
+</html>

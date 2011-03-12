@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+
+  <display-name>sandbox-webapp</display-name>
+  
+  <filter>
+    <filter-name>AccessLogFilter</filter-name>
+    <filter-class>org.elfwerks.filters.AccessLogFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>AccessLogFilter</filter-name>
+    <url-pattern>/hello/*</url-pattern>
+  </filter-mapping>
+  
+  <servlet>
+  	<servlet-name>HelloServlet</servlet-name>
+  	<servlet-class>org.elfwerks.servlets.HelloServlet</servlet-class>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>HelloServlet</servlet-name>
+  	<url-pattern>/hello/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet> 
+    <servlet-name>QuartzInitializer</servlet-name> 
+    <servlet-class>org.quartz.ee.servlet.QuartzInitializerServlet</servlet-class> 
+    <init-param>
+      <param-name>shutdown-on-unload</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>QuartzJobInitializationServlet</servlet-name>
+    <servlet-class>org.elfwerks.servlets.QuartzJobInitializationServlet</servlet-class>
+    <load-on-startup>10</load-on-startup>
+  </servlet>
+
+</web-app>
+    
