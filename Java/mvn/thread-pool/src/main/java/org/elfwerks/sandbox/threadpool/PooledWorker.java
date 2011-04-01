@@ -15,6 +15,11 @@ public class PooledWorker {
         }
         
         public void run() {
+            try {
+                Thread.sleep(1000); /* sleep 1s */
+            } catch (InterruptedException ex) {
+                log.warn(ex);
+            } 
             log.info("Processed message: ["+message+"]");
         }
         
@@ -30,9 +35,10 @@ public class PooledWorker {
     
     public void createWork() {
         log.debug("Begin - creating messages.");
-        for (int ii = 0; ii < 25; ii++) {
-            WorkTask wt = new WorkTask("Message-"+ii);
-            taskExecutor.execute(wt);
+        for (int ii = 0; ii < 15; ii++) {
+            String msg = "Message-"+ii;
+            taskExecutor.execute(new WorkTask(msg));
+            log.info("enqueued: ["+msg+"]");
         }
         log.debug("Finished - creating messages.");
     }
