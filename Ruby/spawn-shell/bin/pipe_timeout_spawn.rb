@@ -5,6 +5,7 @@ require 'timeout'
 def pipe_timeout_spawn(cmd, timeout)
   success = false
   pid = nil
+  pipe = nil
   Timeout.timeout(timeout) do
     pipe = IO.popen(cmd)
     pid = pipe.pid
@@ -21,6 +22,8 @@ rescue Timeout::Error
   Process.detach(pid)
   puts "TIMEOUT"
   nil
+ensure
+  pipe.close if pipe
 end
 
 
@@ -32,4 +35,14 @@ if pipe_results
   puts "FAILURE - results: --[#{pipe_results}]--"
 else
   puts "Success, timeout killed process."
+end
+
+pipe_results = pipe_timeout_spawn("sleep 1", 2)
+if pipe_results and pipe_results.length < 1
+  puts "Success, received a zero length string, spawned command had no output."
+elsif pipe_results 
+  puts "FAILURE, received --[#{pipe_results}]--, should have received an empty string."
+  puts 
+else
+  puts "FAILURE, received a FALSE result"
 end
