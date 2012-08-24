@@ -1,0 +1,7 @@
+This pattern is an example of how to create a hierarchy of classes,
+each with a factory method that returns a pointer to a constructed
+object.  Each class will register via a string name it's factory
+constructor before main is invoked.  Thus a user of the FactoryFactory
+can simply ask for a new object by name at runtime.
+
+

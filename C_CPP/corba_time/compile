@@ -1,0 +1,1 @@
+g++ -w -fno-strict-prototypes -DACE_LACKS_PRAGMA_ONCE -I/u2/ACE_wrappers -I/u2/ACE_wrappers/TAO timeS.cpp -c 

@@ -1,0 +1,73 @@
+#!/usr/local/bin/perl
+
+
+print STDERR "child: UID($<), EUID($>)\n";
+
+open (FILE, ">test.out");
+
+if ( !defined(fileno STDIN) ) {
+    print FILE "--- !!! STDIN in not open\n";
+} else {
+    $stdin_fdes = fileno STDIN;
+}
+if ( !defined(fileno STDOUT) ) {
+    print FILE "--- !!! STDOUT in not open\n";
+} else {
+    $stdout_fdes = fileno STDOUT;
+}
+if ( !defined(fileno STDERR) ) {
+    print FILE "--- !!! STDERR in not open\n";
+} else {
+    $stderr_fdes = fileno STDERR;
+}
+
+## #####
+($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,
+ $size,$atime,$mtime,$ctime,$blksize,$blocks)
+    = stat STDIN;
+
+print FILE "--- Dev:     $dev\n";
+print FILE "--- Inode:   $ino\n";
+print FILE "--- Mode:    $mode\n";
+print FILE "--- #Links:  $nlink\n";
+print FILE "--- UID:     $uid\n";
+print FILE "--- GID:     $gid\n";
+print FILE "--- RDev:    $rdev\n";
+print FILE "--- Size:    $size\n";
+print FILE "--- atime:   $atime\n";
+print FILE "--- mtime:   $mtime\n";
+print FILE "--- ctime:   $ctime\n";
+print FILE "--- BlkSize: $blksize\n";
+print FILE "--- Blocks:  $blocks\n";
+print FILE "--- -------------------\n";
+
+## #####
+
+print FILE "--- STDIN:   $stdin_fdes\n";
+print FILE "--- STDOUT:  $stdout_fdes\n";
+print FILE "--- STDERR:  $stderr_fdes\n";
+
+print FILE "--- ARGS: @ARGV\n";
+
+print FILE "--- Environment -------\n";
+foreach $key (keys %ENV) {
+    print FILE "$key=$ENV{$key}\n";
+}
+print FILE "--- End Environment ---\n";
+
+print FILE "--- STDIN Begin ----\n";
+@IN = <STDIN>;
+print FILE @IN;
+print FILE "--- STDIN End   ----\n";
+
+seek STDIN, 0, 0;               # rewind
+
+print FILE "--- STDIN Begin ----\n";
+@IN = <STDIN>;
+print FILE @IN;
+print FILE "--- STDIN End   ----\n";
+
+close(FILE);
+
+print STDERR "Message from the exec'ed program - EGG\n";
+exit(0);

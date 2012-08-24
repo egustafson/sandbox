@@ -1,0 +1,37 @@
+--- Dev:     1024
+--- Inode:   1890673
+--- Mode:    33152
+--- #Links:  1
+--- UID:     0
+--- GID:     0
+--- RDev:    7788559
+--- Size:    18
+--- atime:   996115833
+--- mtime:   996078716
+--- ctime:   996080382
+--- BlkSize: 8192
+--- Blocks:  2
+--- -------------------
+--- STDIN:   0
+--- STDOUT:  1
+--- STDERR:  2
+--- ARGS: 
+--- Environment -------
+HOME=/home
+--- End Environment ---
+--- STDIN Begin ----
+1a
+2b
+3c
+4d
+5e
+6f
+--- STDIN End   ----
+--- STDIN Begin ----
+1a
+2b
+3c
+4d
+5e
+6f
+--- STDIN End   ----
