@@ -1,0 +1,54 @@
+#!/usr/local/bin/wish
+
+frame .mbar -relief raised -bd 2
+pack .mbar 
+
+menubutton .mbar.start -text Start -underline 0 -menu .mbar.start.menu
+menubutton .mbar.view -text View -underline 0 -menu .mbar.view.menu
+menubutton .mbar.help -text Help -underline 0 -menu .mbar.help.menu
+
+pack .mbar.start .mbar.view -side left
+pack .mbar.help -side right
+
+menu .mbar.start.menu -tearoff 0
+.mbar.start.menu add command -label "Orbix" -command {startService orbixd} 
+.mbar.start.menu add command -label "EventManager" -command {startService EventManager} 
+.mbar.start.menu add command -label "Provisioner" -command {startService Provisioner} 
+.mbar.start.menu add command -label "IdProvisioner" -command {startService IdProvisioner} 
+.mbar.start.menu add command -label "NetworkRouter" -command {startService NetworkRouter} 
+.mbar.start.menu add command -label "ServicesRouter" -command {startService ServicesRouter} 
+.mbar.start.menu add separator
+.mbar.start.menu add command -label "Exit" -command exit
+
+menu .mbar.view.menu -tearoff 0
+.mbar.view.menu add command -label "Orbix" -command {} 
+
+menu .mbar.help.menu -tearoff 0
+.mbar.help.menu add command -label "About" -command aboutDialog
+
+
+# ------------------------------------------------------------
+
+proc aboutDialog {} {
+
+    toplevel .about
+    message  .about.msg -justify left -width 10c -bd 4 \
+            -text "A tool to start Vswitch components."
+    frame .about.space -height 10
+    button .about.ok -text "Ok" -command {destroy .about}
+    pack .about.msg .about.space .about.ok -side top
+}
+
+proc startService { cmdName } {
+
+    toplevel .start
+    label .start.cmd -text "Start:  $cmdName" -bd 10
+    frame .start.action
+    pack .start.cmd .start.action -side top
+
+    button .start.action.start -text "Start"
+    button .start.action.cancel -text "Cancel" -command {destroy .start}
+    pack .start.action.start .start.action.cancel -padx 2m -side left
+
+}
+

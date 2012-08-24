@@ -1,0 +1,19 @@
+#!/usr/local/bin/wish
+
+wm title . "xtstart"
+
+frame .mbar -relief raised
+pack .mbar
+
+menubutton .mbar.xterm -text xterm -underline 1 -menu .mbar.xterm.menu
+button .mbar.icon -text icon -relief flat -underline 0 -command { wm iconify . }
+button .mbar.exit -text exit -relief flat -underline 1 -command exit
+
+pack .mbar.xterm .mbar.icon -side left
+pack .mbar.exit -side right
+
+menu .mbar.xterm.menu -tearoff 0
+.mbar.xterm.menu add command -label "ve" -command {}
+.mbar.xterm.menu add command -label "brick" -command { exec rsh brick /usr/bin/X11/xterm -n brick -display loki:0.0 & }
+.mbar.xterm.menu add command -label "play-doh" -command { exec rsh play-doh /usr/bin/X11/xterm -n play-doh -display loki:0.0 & }
+

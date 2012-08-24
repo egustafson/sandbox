@@ -1,0 +1,33 @@
+#!/usr/local/bin/wish
+
+proc varPrompt { prefix varName  } {
+
+    set fn "$prefix$varName"
+
+    frame $fn
+    label $fn.label -text "$varName : "
+    entry $fn.entry -width 20 -relief sunken -bd 2 -textvariable env($varName)
+    pack $fn.label $fn.entry -side left -padx 1m -pady 2m
+    return $fn
+}
+
+# ============================================================
+
+set envVars [list "TKVAR1" "TKVAR2"]
+
+foreach env_var $envVars {
+    set prompt [varPrompt ".e" $env_var]
+    pack $prompt -side top
+}
+
+frame .y
+button .y.print -text "Print" -command {exec /usr/bin/X11/xterm &}
+button .y.exit -text "Done" -command exit
+pack  .y.print .y.exit -side left
+
+pack .y -side top
+
+
+
+
+

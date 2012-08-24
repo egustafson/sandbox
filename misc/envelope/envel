@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+print "Enter your return address:\n";
+for ($i=1; $i <= 4; $i++)
+{
+  chop($ret_addr[$i] = <STDIN>);
+}
+
+print "\nEnter the mailing address:\n";
+for ($i=1; $i <= 4; $i++)
+{
+  chop($mail_addr[$i] = <STDIN>);
+}
+
+open(ENV_FILE, ">env.ps") || die "Can't open env.ps";
+&print_envelope;
+
+exit(0);
+
+# END of MAIN program
+#
+
+#
+# Subroutines below
+#
+
+#
+# Now dump the postscript envelope, substituting in the
+# addresses
+#
+
+sub print_envelope {
+
+print ENV_FILE <<"EOF";
+%!PS-Adobe-2.0
+%%Title: /tmp/xfig-fig000217
+%%Creator: fig2dev Version 2.1.8 Patchlevel 0
+%%CreationDate: Fri Dec 10 12:48:34 1993
+%%For: egustafs@play-doh (Eric Gustafson)
+%%Orientation: Portrait
+%%BoundingBox: 270 362 432 757
+%%Pages: 1
+%%EndComments
+/\$F2psDict 200 dict def 
+\$F2psDict begin
+\$F2psDict /mtrx matrix put
+/l {lineto} bind def
+/m {moveto} bind def
+/s {stroke} bind def
+/n {newpath} bind def
+/gs {gsave} bind def
+/gr {grestore} bind def
+/clp {closepath} bind def
+/graycol {dup dup currentrgbcolor 4 -2 roll mul 4 -2 roll mul
+4 -2 roll mul setrgbcolor} bind def
+/col-1 {} def
+/col0 {0 0 0 setrgbcolor} bind def
+/col1 {0 0 1 setrgbcolor} bind def
+/col2 {0 1 0 setrgbcolor} bind def
+/col3 {0 1 1 setrgbcolor} bind def
+/col4 {1 0 0 setrgbcolor} bind def
+/col5 {1 0 1 setrgbcolor} bind def
+/col6 {1 1 0 setrgbcolor} bind def
+/col7 {1 1 1 setrgbcolor} bind def
+/col8 {.68 .85 .9 setrgbcolor} bind def
+/col9 {0 .39 0 setrgbcolor} bind def
+/col10 {.65 .17 .17 setrgbcolor} bind def
+/col11 {1 .51 0 setrgbcolor} bind def
+/col12 {.63 .13 .94 setrgbcolor} bind def
+/col13 {1 .75 .8 setrgbcolor} bind def
+/col14 {.7 .13 .13 setrgbcolor} bind def
+/col15 {1 .84 0 setrgbcolor} bind def
+	end
+/\$F2psBegin {\$F2psDict begin /\$F2psEnteredState save def} def
+/\$F2psEnd {\$F2psEnteredState restore end} def
+%%EndProlog
+
+\$F2psBegin
+0 setlinecap 0 setlinejoin
+0.0 792.0 translate 0.900 -0.900 scale
+/Helvetica findfont 14.00 scalefont setfont
+464 39 m 
+gs 1 -1 scale  270.0 rotate ($ret_addr[1]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+449 39 m 
+gs 1 -1 scale  270.0 rotate ($ret_addr[2]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+434 39 m 
+gs 1 -1 scale  270.0 rotate ($ret_addr[3]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+419 39 m 
+gs 1 -1 scale  270.0 rotate ($ret_addr[4]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+344 319 m 
+gs 1 -1 scale  270.0 rotate ($mail_addr[1]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+329 319 m 
+gs 1 -1 scale  270.0 rotate ($mail_addr[2]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+314 319 m 
+gs 1 -1 scale  270.0 rotate ($mail_addr[3]) col-1 show gr
+/Helvetica findfont 14.00 scalefont setfont
+299 319 m 
+gs 1 -1 scale  270.0 rotate ($mail_addr[4]) col-1 show gr
+showpage
+\$F2psEnd
+EOF
+
+}

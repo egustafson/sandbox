@@ -1,0 +1,5 @@
+verb is am are was were be being ben do
+noun dog cat horse cow
+verb chew eat lick
+verb run stand sleep
+dog is horse.
