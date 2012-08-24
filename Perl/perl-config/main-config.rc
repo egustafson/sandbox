@@ -1,0 +1,4 @@
+$CFG_NAME = "xyzzy";
+
+$CFG_HASH{A} = 1;
+$CFG_HASH{B} = 2;

@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use Socket;
+
+socket(my $msgsock, PF_INET, SOCK_DGRAM, getprotobyname("udp"))
+    or die "socket: $!";
+
+my $discardport = getservbyname("discard", "udp");
+my $discardaddr = sockaddr_in($discardport, IN_ADDRLOOPBACK);
+send($msgsock, "x", 0, $discardaddr);
+
+
+##
+my $sockaddr = getsockname($msgsock);
+my ($port, $addr) = sockaddr_in($sockaddr);
+my $name = gethostbyaddr($addr,AF_INET);
+printf "I am %s [%vd] on port $port\n", $name, $addr, $port;
+##
+

@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+# #!/usr/local/bin/suidperl
+
+#$clue_home  = "/home/clue/public_html";
+#$clue_home  = "/home/egustafs/tmp/public_html";
+$clue_home  = "./junk.dir";
+$clue_user  = "clue";
+$clue_group = "clue";
+$file_perm  = 0664;
+$dir_perm   = 0775;
+
+print "Fixing permissions...\n";
+
+($dev,$ino,$mode,$nlink) = stat($clue_home);
+&dodir($clue_home,$nlink);
+
+exit 0;
+
+
+
+sub dodir {
+    local($dir,$nlink) = @_;
+    local($dev,$ino,$mode,$nlink);
+    opendir(DIR,$dir);
+    @filenames = readdir(DIR);
+    
+    local(@subdirs, @files);
+    local($fullname);
+
+
+    for (@filenames) {
+        $fullname = "$dir/$_";
+        if ( -d $fullname ) {
+            if (( $_ ne '.' ) && ( $_ ne '..' )) {
+                push(@subdirs,$fullname);
+            }
+        } else {
+            push(@files,$fullname);
+        }
+    }
+
+    for (@files) {
+        chown( (getpwnam($clue_user))[2], (getgrnam($clue_group))[2], $_ );
+        chmod( $file_perm, $_ );
+    }
+
+    for (@subdirs) {
+        chown( (getpwnam($clue_user))[2], (getgrnam($clue_group))[2], $_ );
+        chmod( $dir_perm, $_ );
+
+        ($dev,$ino,$mode,$nlink) = stat($_);
+        &dodir($_,$nlink);
+    }
+
+}

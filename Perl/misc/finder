@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+$clue_home = ".";
+
+($dev,$ino,$mode,$nlink) = stat($clue_home);
+&dodir($clue_home,$nlink);
+
+exit 0;
+
+
+
+sub dodir {
+    local($dir,$nlink) = @_;
+    local($dev,$ino,$mode,$nlink);
+    opendir(DIR,$dir);
+    @filenames = readdir(DIR);
+    
+    local(@subdirs, @files);
+    local($fullname);
+
+
+    for (@filenames) {
+        $fullname = "$dir/$_";
+        if ( -d $fullname ) {
+            if (( $_ ne '.' ) && ( $_ ne '..' )) {
+                push(@subdirs,$fullname);
+            }
+        } else {
+            push(@files,$fullname);
+        }
+    }
+
+    for (@files) {
+        print("file: ", $_, "\n");
+    }
+
+    for (@subdirs) {
+
+        print("dir:  ", $_, "\n");
+
+        ($dev,$ino,$mode,$nlink) = stat($_);
+        &dodir($_,$nlink);
+    }
+
+}

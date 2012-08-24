@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+open(FIND, "find . -print |") || die "Couldn't run find: $!\n";
+
+FILE:
+    while ($filename = <FIND>) {
+	chop $filename;
+	next FILE unless -T $filename;
+	$_ = $filename;
+	if ( /\.[ch]$/ ) {
+	    if (!open(TEXTFILE, $filename)) {
+		print STDERR "Can't open $filename - continuing...\n";
+		next FILE;
+	    } 
+	} else {
+	    next FILE;
+	}
+
+	$_ = <TEXTFILE>;
+	if ( /-\*- C\+\+ -\*-/ ) {
+	    system "/bin/echo etags -C -a $filename";
+	    #print "etags -C -a $filename\n";
+	} else {
+	    system "/bin/echo etags -a $filename";
+	    #print "etags -a $filename\n";
+	}
+	close(TEXTFILE);
+    }
+

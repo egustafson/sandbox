@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+require HTTP::Request;
+require LWP::UserAgent;
+
+$s_day   = 6;
+$s_month = 1;
+$s_year  = 1987;
+
+$f_day   = 1;
+$f_month = 1;
+$f_year  = 1990;
+
+$symbol  = "dis";
+
+# $r_addr = 'http://table.finance.yahoo.com/table.csv?a=3&b=8&c=2002&d=6&e=9&f=2002&s=intc&y=0&g=d&ignore=.csv';
+$r_addr = 'http://table.finance.yahoo.com/table.csv?a=' . $s_month . '&b=' . $s_day . '&c=' . $s_year .
+    '&d=' . $f_month . '&e=' . $f_day . '&f=' . $f_year . '&s=' . $symbol . '&y=0&g=d&ignore=.csv';
+
+# $r_addr = 'http://table.finance.yahoo.com/d?a=7&b=1&c=98&d=7&e=31&f=98&g=d&s=dis';
+
+$ua = LWP::UserAgent->new;
+$request = HTTP::Request->new(GET => $r_addr);
+$response = $ua->request($request);
+
+print $response->content();

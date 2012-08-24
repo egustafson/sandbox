@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl
+
+use Tk;
+
+
+if ( $ENV{DISPLAY} ) {
+    tk_hello();
+} else {
+    term_hello();
+}
+
+exit;
+
+## ############################################################
+
+sub tk_hello {
+
+    my $mw = MainWindow->new;
+    $mw->title("Hello World");
+    $mw->Button(-text => "Done", -command => sub { exit })->pack;
+    MainLoop;
+
+}
+
+## ############################################################
+
+sub term_hello {
+
+    print "Hello World\n";
+}
+
+
+

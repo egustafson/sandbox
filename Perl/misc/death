@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+
+@sigs		    = ('HUP', 'INT', 'QUIT', 'ILL', 'TRAP', 'IOT', 'EMT', 'FPE',
+		       'BUS', 'SEGV', 'SYS', 'TERM', 'USR1', 'USR2', 'XCPU', 
+		       'XFSZ', 'PIPE');
+
+
+print "I am PID ", $$, "\n";
+
+foreach (@sigs) 
+  {
+    $SIG{$_} = 'handler';
+  }
+
+while ( 1 != 0 )
+{
+  sleep;
+  printf " *\n";
+}
+
+printf "Exited normally.\n";
+exit(0);
+
+#
+# subroutine
+#
+
+sub handler 
+{
+  print STDERR "Caught signal @_[0]";
+}

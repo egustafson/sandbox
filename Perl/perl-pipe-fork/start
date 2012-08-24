@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+
+print "Start 1\n";
+
+open(FIN, "|finish");
+
+print "Start 2\n";
+
+exit;

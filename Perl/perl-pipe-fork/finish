@@ -1,0 +1,7 @@
+#!/usr/local/bin/perl
+
+print "Finish.\n";
+sleep(30);
+
+print "Finish - exit\n";
+exit;
