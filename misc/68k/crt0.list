@@ -1,0 +1,56 @@
+68K GAS  crt0.s 			page 1
+
+
+   1               	# crt0.s          
+   2               	#
+   3               	# C RunTime - Necessary 'glue' code to link against a
+   4               	#  gcc generated program.  
+   5               	#
+   6               	# Author:  Eric Gustafson
+   7               	# Date:    24 February 1999
+   8               	#
+   9               	
+  10               	# ############################################################
+  11               	
+  12               	# Initialize the initial stack pointer and program counter
+  13               	
+  14               	.text
+  15               	        .org    0x000000
+  16               	_ISP:        
+  17 0000 0000 7FFE 	        .long   0x07ffe
+  18               	_IPC:
+  19 0004 0000 0400 	        .long   _start
+  20               	
+  21               	# Place the rest of the text segment starting at 0x0400
+  22               	
+  23 0008 0000 0000 	        .org    0x000400
+  23      0000 0000 
+  23      0000 0000 
+  23      0000 0000 
+  23      0000 0000 
+  24               	.globl  _start
+  25               	_start:
+  26 0400 6100 FBFE 	        bsr     _main
+  27 0404 4848      	        .word   0x4848
+  28               	# '0x4848' is a "break" instruction in the BSVC simulator.
+  29               	# This implements a software break point. (i.e. 4E75 rts)
+  30               	
+  31               	#
+  32               	# Implement ___main for gcc.  Nothing to do, so just return.
+  33               	#
+  34               	.globl  ___main
+  35               	___main:
+  36 0406 4E75      	        rts
+  37               	
+  38               	# End
+68K GAS  crt0.s 			page 2
+
+
+DEFINED SYMBOLS
+              crt0.s:16     text:00000000 _ISP
+              crt0.s:18     text:00000004 _IPC
+              crt0.s:25     text:00000400 _start
+              crt0.s:35     text:00000406 ___main
+
+UNDEFINED SYMBOLS
+_main

@@ -1,0 +1,50 @@
+68K GAS  main.s 			page 1
+
+
+   1               	#NO_APP
+   2               	gcc2_compiled.:
+   3               	___gnu_compiled_c:
+   4               	.text
+   5               		.even
+   6               	.globl _main
+   7               	_main:
+   8 0000 4EB9 0000 		jbsr ___main
+   8      0000 
+   9 0006 611A      		jbsr _get_sr
+  10 0008 0640 F900 		addw #-1792,d0
+  11 000c 3040      		movew d0,a0
+  12 000e 2F08      		movel a0,sp@-
+  13 0010 6108      		jbsr _set_sr
+  14 0012 7000      		moveq #0,d0
+  15 0014 588F      		addql #4,sp
+  16 0016 4E75      		rts
+  17 0018 4E71      		nop
+  18               		.even
+  19               	.globl _set_sr
+  20               	_set_sr:
+  21               	#APP
+  22 001a 46EF 0006 		move sp@(6),sr
+  23               	#NO_APP
+  24 001e 4E75      		rts
+  25 0020 4E71      		nop
+  26               		.even
+  27               	.globl _get_sr
+  28               	_get_sr:
+  29               	#APP
+  30 0022 4280      		clrl d0
+  31 0024 40C0      		move sr,d0
+  32               	#NO_APP
+  33 0026 4E75      		rts
+  34 0028 4E71 0000 		nop
+68K GAS  main.s 			page 2
+
+
+DEFINED SYMBOLS
+              main.s:2      text:00000000 gcc2_compiled.
+              main.s:3      text:00000000 ___gnu_compiled_c
+              main.s:7      text:00000000 _main
+              main.s:28     text:00000022 _get_sr
+              main.s:20     text:0000001a _set_sr
+
+UNDEFINED SYMBOLS
+___main

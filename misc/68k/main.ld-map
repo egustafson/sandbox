@@ -1,0 +1,37 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000000                PROVIDE (__stack, 0x0)
+
+.text           0x00000000      0x434
+ CREATE_OBJECT_SYMBOLS
+ *(.text)
+ .text          0x00000000      0x408 crt0.o
+                0x00000406                ___main
+                0x00000400                _start
+ .text          0x00000408       0x2c main.o
+                0x00000422                _set_sr
+                0x0000042a                _get_sr
+                0x00000408                _main
+                0x00000434                _etext=.
+                0x00000434                __etext=.
+
+.data           0x00000434        0x0
+                0x00000434                _edata=.
+                0x00000434                __edata=.
+
+.bss            0x00000434        0x0
+                0x00000434                __bss_start=.
+ *(.bss)
+ *(COMMON)
+                0x00000434                _end=ALIGN(0x4)
+                0x00000434                __end=ALIGN(0x4)
+Address of section .text set to 0x0
+LOAD crt0.o
+LOAD main.o
+OUTPUT(main.srec srec)

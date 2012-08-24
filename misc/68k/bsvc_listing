@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+while ( <> ) {
+
+    if ( /\.text\s+0x[\da-f]+\s+0x[\da-f]+\s(\w+\.o)/ ) {
+        $curr_obj = $1;
+    }
+
+    if ( /\.data/ ) {
+        $curr_obj = ".data";
+    }
+
+    if ( (/^\s+0x([\da-f]+)\s+(_\w+)$/) && ($curr_obj ne ".data") ) {
+        $symbols{$2} = $1;
+        $files{$2}   = $curr_obj;
+        $addrs{$1}   = $2;
+    }
+
+}
+
+foreach $addr (sort(keys(%addrs))) {
+
+    $sym = $addrs{$addr};
+    print "----------------\n";
+    print "0x$symbols{$sym} : $sym ($files{$sym})\n";
+    printsub($files{$sym}, $sym, hex($symbols{$sym}));
+}
+
+# $sym = "_main";
+# printsub($files{$sym}, $sym, hex($symbols{$sym}));
+
+
+
+sub printsub {
+
+    local ($file, $func, $ldaddr) = @_;
+    local ($foundit)     = 0;   # false
+    local ($finished)    = 0;   # false
+    local ($symbase)     = -1;
+    local ($address);
+
+    $file =~ s/\.o$/\.l/;
+    open(FILE, $file);
+
+    while ( ($line = <FILE>) && (!$finished) ) {
+
+        $line =~ /\.globl\s+(\w+)$/;
+        if ( $func eq $1 ) {
+            $foundit = 1;       # true
+        }
+
+        if ( $foundit && !$finished ) {
+            if ( $line =~ /^(\s+\d+ )([\dA-Fa-f]+) (.*)$/ ) {
+                if ( $symbase < 0 ) {
+                    $symbase = hex($2);
+                }
+                $address = sprintf("%08x", (hex($2) - $symbase) + $ldaddr);
+                printf("%s  %s\n", $address, $3);
+            } else {
+                $line =~ /^(\s+\d+ )(.*)$/;
+                print "          $2\n";
+            }
+            $line =~ /4E75\s+rts/ && ($finished = 1); # true
+        }
+    }
+    close(FILE);
+}

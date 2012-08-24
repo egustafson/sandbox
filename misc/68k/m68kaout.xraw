@@ -1,0 +1,29 @@
+OUTPUT_FORMAT("a.out-zero-big", "a.out-zero-big",
+	      "a.out-zero-big")
+OUTPUT_ARCH(m68k)
+ SEARCH_DIR(/usr/local/m68000-sun-aout/lib);
+PROVIDE (__stack = 0);
+SECTIONS
+{
+  .text :
+  {
+    CREATE_OBJECT_SYMBOLS
+    *(.text)
+    _etext = .;
+    __etext = .;
+  }
+  .data :
+  {
+    CONSTRUCTORS
+    _edata  =  .;
+    __edata  =  .;
+  }
+  .bss :
+  {
+    __bss_start = .;
+   *(.bss)
+   *(COMMON)
+   _end = ALIGN(4) ;
+   __end = ALIGN(4) ;
+  }
+}
