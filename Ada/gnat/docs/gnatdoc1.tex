@@ -1,0 +1,1289 @@
+\documentstyle[11pt]{article}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  
+%%  set the page margins.
+%%  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\oddsidemargin}{0.1in}
+\setlength{\evensidemargin}{0.1in}
+\setlength{\textwidth}{6in}
+\setlength{\topmargin}{-0.5in}
+\setlength{\textheight}{8.5in}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\xline{\mbox{}\hrulefill\mbox{}}
+%
+\begin{document}
+%%
+\pagestyle{plain}
+\pagenumbering{arabic}
+%%
+%\mbox{\ }
+
+\title{The GNAT Project: A GNU-Ada9X Compiler\\
+\ \\}
+
+\date{}
+
+\author{The GNAT team\thanks{Robert Dewar and Edmond Schonberg are the
+principal investigators on the project. The team is based at New York
+University, and includes active participants from a number of other
+institutions (listed below): Bernard Banner, Cyrille Comar, Sam
+Figueroa, Richard Kenner, Brett Porter, Gail Schenker (all at NYU),
+Franco Gasperoni (Telecom Paris), Ted Giering (Florida State
+University), Paul Hilfinger (UC-Berkeley), Yvon Kermarrec (Telecom
+Bretagne), Laurent Pautet (Telecom Paris) and Jean-Pierre Rosen
+(Adalog).}
+ %
+\\
+ %
+{\small \mbox{\ \hskip 4cm} gnat-report@cs.nyu.edu \mbox{\ \hskip 4cm}}\\
+{\small Courant Institute of Mathematical Sciences}\\
+{\small New York University}\\
+{\small 251 Mercer Street, New York, NY 10012}\\
+{\small \mbox{\ }}
+\and
+Cyrille Comar \\
+{\small comar@cs.nyu.edu}\\
+{\small Sup'A\'ero and}\\
+{\small New York University}\\
+{\small Computer Science Dept.}
+\and 
+Franco Gasperoni\\
+{\small gasperon@inf.enst.fr}\\
+{\small T\'el\'ecom Paris -- ENST}\\
+{\small D\'epartement Informatique}
+\and
+Edmond Schonberg\\
+{\small schonber@cs.nyu.edu}\\
+{\small New York University}\\
+{\small Computer Science Dept.}
+%
+}
+
+%
+
+\maketitle
+\setlength{\baselineskip}{16pt}
+
+\pagestyle{plain}
+
+\mbox{\ }
+\vskip 1cm
+
+\begin{center}
+%
+\fbox{
+\begin{minipage}{6in}
+\ \\
+
+\centerline{\bf Abstract}
+
+\ \\
+ %
+ The GNAT project at New York University is building a high-quality
+Ada9X compiler, to be distributed free and with sources, following the
+successful mechanisms established by the Free Software Foundation for
+the GCC compiler.  GNAT will allow students, academics, and software
+professionals to experiment as early as possible with the new version
+of Ada. GNAT will also help the spread of Ada to the software
+community at large.
+ %
+\end{minipage}
+}
+\end{center} 
+
+\mbox{\ }
+\vskip 3cm
+
+
+\pagebreak
+
+\mbox{\ }
+\vskip 3cm
+
+\fbox{
+\begin{minipage}{6in}
+\tableofcontents
+\end{minipage}}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%                                  MAIN TEXT
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+
+
+\section{Introduction: Ada9X and the GNAT Project}
+
+The Ada community has proposed a number of explanations for
+the relative lack of success of Ada vis-a-vis of C and more recently
+C{\tt ++}, in spite of the clear superiority of Ada as a language for 
+software engineering. At least one
+reason for the slow spread of Ada through the software community has been
+the absence of a cheap (or even free) high-quality compiler that can run
+on a variety of platforms and is usable both for training and serious
+software construction.  The issue of training is a particularly critical one:
+students (and universities) cannot afford expensive programming environments,
+and the choice of programming languages for teaching is often ruled by cost
+considerations. The widespread use of C is in part due to the ubiquitousness
+of UNIX. The recent successes of C{\tt ++} are at least in part
+attributable to the availability of Turbo-C{\tt ++} on PC's,
+and of course G{\tt ++} (the GCC C{\tt ++} compiler) on  UNIX platforms.
+
+The imminent introduction of Ada9X presents us with a new opportunity. The
+language \cite{rm-9x} offers up-to-date tools for object-oriented
+programming, for information systems, for distributed systems, for interfacing
+with other languages, for hierarchical system decomposition, etc. If a free,
+high-quality compiler were to appear at the same time as the standardization
+of the language is completed, it would assist considerably in spreading the
+knowledge of the new language, and in encouraging comparisons with existing
+languages (in which we can expect Ada9X to show its superiority). 
+\\ \\
+The GNAT project aims to produce such a compiler. GNAT (an acronym for
+GNU NYU Ada Translator), is a front-end and runtime system for Ada9X that
+uses the successful GCC back-end as a retargettable code generator. GNAT
+is thus part of the GNU software, and is distributed according to the
+guidelines of the Free Software Foundation. GNAT will be a complete compiler,
+but will not be validaded by New York University. In  fact, GNAT will be
+available before validation procedures for Ada9X compilers are completed,
+because timeliness is crucial to its mission. Preliminary versions of GNAT,
+albeit very incomplete, are already being distributed,  and are contributing
+to the diffusion of the language. The availability of sources for the system
+is allowing language designers and implementors to participate in the
+writing of GNAT itself. Compiler constructors are also benefiting from the
+existence of a reference implementation for new language constructs. We
+give below information on how to obtain GNAT and how to participate in
+the community effort of completing and improving it.
+\\ \\
+The next section  describes the GCC compiler system. Next we summarize the
+structure of GNAT. Following sections discuss some details of the front-end
+and code generator. We then present what is probably the most
+innovative aspect of GNAT, namely the library mechanism. We then discuss the
+binder, and conclude with a status report on the completion and
+performance of the system.
+
+\section{GCC: An Industrial-Strength Compiler}
+
+GCC is the compiler system of the GNU environment. GNU (a self-referential
+acronym for ``GNU is Not Unix'') is a Unix-compatible operating system,
+being developed by the Free Software Foundation, and distributed under the
+GNU Public License (GPL). GNU software is always distributed with its sources,
+and the GPL enjoins anyone who modifies GNU software and then redistributes
+the modified product to supply the sources for the modifications as well. 
+In this fashion,  enhancements to the original software benefit the software
+community at large \cite{gnu-manual}.
+
+GCC is today the centerpiece of the GNU software. GCC is a
+retargetable and rehostable compiler system, with multiple front-ends
+and a large number of hardware targets. Originally designed as a
+compiler for C, it now includes front-ends for C{\tt ++}, Modula-3,
+Fortran, Objective-C, and most recently Ada. Technically, the crucial
+asset of the GCC is its mostly language-independent,
+target-independent code generator, which produces code of excellent
+quality both for CISC machines such as the Intel and Motorola
+families, as well as RISC machines such as the IBM RS/6000, the DEC
+Alpha, or the MIPS R4000. Remarkably, the machine dependences of the
+code generator represent less than 10\% of the total code.  To add a
+new target to GCC, an algebraic description of each machine
+instruction must be given using a register-transfer language. Most of
+the code generation and optimization then uses the RTL, which GCC maps
+when needed into the target machine language. The leverage of
+constructing a front-end for GCC is thus enormous: GNAT potentially
+has over 30 targets, and runs already on more that half-a-dozen of
+them. An Ada9X cross-compiler for a Motorola real-time controller chip
+was built in a few days using standard GCC configuration tools for
+cross-compilation. Furthermore, GCC produces high-quality code,
+comparable to that of the best commercial compilers.
+
+\section{The Organization of GNAT}
+
+\subsection{Introduction}
+ %
+The first decision to be made was the language in which GNAT should be
+written. GCC is fully written in C, but for technical reasons as well
+as non-technical ones,  it was inconceivable to use anything but Ada for GNAT
+itself. We started using a relatively small subset of Ada83, and in typical
+fashion extended the subset whenever new features became implemented. Six
+months after the coding started in earnest,  we were able to bootstrap the
+compiler, and abandon the commercial compiler we had been using up to that
+point. As Ada9X features are implemented,  we are now able to write GNAT
+in Ada9X. In fact, the definition of the language depends heavily on 
+hierarchical libraries, and cannot be given except in Ada9X, so that it is
+natural for the compiler and the environment to use child units throughout.
+\\ 
+Figure~\ref{structure} shows the overall structure of the GNAT system.
+%
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.007500in}%
+%
+\begingroup\makeatletter
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\endgroup
+\begin{picture}(867,498)(3,317)
+\thinlines
+\put(152,523){\framebox(72,86){}}
+\put(304,345){\dashbox{3}(67,79){}}
+\put(  3,531){\dashbox{3}(68,78){}}
+\put(304,719){\dashbox{3}(67,80){}}
+\put( 3,320){\dashbox{3}(67,78){}}
+\put(304,531){\dashbox{3}(67,78){}}
+\put(636,531){\framebox(79,78){}}
+\put(465,532){\framebox(71,77){}}
+\put(802,531){\dashbox{3}(68,78){}}
+\put(736,568){\vector( 1, 0){ 56}}
+\put( 81,568){\vector( 1, 0){ 56}}
+\put(564,568){\vector( 1, 0){ 61}}
+\put(157,520){\line( 1, 0){ 71}}
+\put(228,520){\line( 0, 1){ 86}}
+\put(378,434){\vector( 2, 3){ 70}}
+\put( 44,405){\vector( 2, 3){ 90}}
+\multiput(341,517)(0.00000,-9.28571){8}{\makebox(0.7407,1.1111){\SetFigFont{10}{12}{rm}.}}
+\put(469,530){\line( 1, 0){ 71}}
+\put(540,530){\line( 0, 1){ 76}}
+\put(384,568){\vector( 1, 0){ 57}}
+\put(237,568){\vector( 1, 0){ 55}}
+\multiput(341,707)(0.00000,-12.00000){7}{\makebox(0.7407,1.1111){\SetFigFont{10}{12}{rm}.}}
+\put( 9,317){\line( 1, 0){ 65}}
+\put( 74,317){\line( 0, 1){ 79}}
+\put(377,711){\vector( 2,-3){ 70}}
+\put(319,747){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}code}}}
+\put(319,557){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}code}}}
+\put(319,373){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}code}}}
+\put(304,616){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}source.o}}}
+\put(815,557){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}cutable}}}
+\put(822,576){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}exe-}}}
+\put(319,766){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}object}}}
+\put(319,576){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}object}}}
+\put(319,391){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}object}}}
+\put(304,806){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}source1.o}}}
+\put(304,431){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}sourcek.o}}}
+\put(  3,616){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}source.adb}}}
+\put( 15,576){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}Ada}}}
+\put( 15,557){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}source}}}
+\put(477,560){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}binder}}}
+\put(477,582){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}GNAT}}}
+%\put(649,542){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}loader}}}
+\put(654,573){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}linker}}}
+\put(166,574){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}GNAT}}}
+\put(162,547){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}compiler}}}
+\put( 14,379){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}GNAT}}}
+\put( 10,357){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}Runtime}}}
+\put( 12,334){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}tasking..}}}
+\end{picture}
+%
+\end{center}
+%
+\caption{\label{structure} The structure of GNAT: 
+compiler, binder, runtime.}
+\end{figure}
+ %
+The front-end of the GNAT compiler is thus written in Ada9X. The back-end 
+of the compiler is the
+back-end of GCC proper, extended to meet the needs of Ada semantics.
+\\ \\
+The front-end comprises four phases,  which communicate by means of a
+rather compact Abstract Syntax Tree (AST).  The implementation details
+of the AST are hidden by several procedural interfaces that provide
+access to syntactic and semantic attributes. The layering of the system,
+and the various levels of abstraction,  are the obvious benefits of
+writing in Ada, in what one might call ``proper'' Ada style.
+\\
+It is worth mentioning that strictly speaking GNAT does not use a
+symbol table. Rather, all semantic information concerning program
+entities is stored in defining occurrences of these entities directy
+in the AST.  The GNAT structures are thus close in spirit to those of
+DIANA ~\cite{diana}, albeit more compact.   It appears that the AST
+will be adequate to support an ASIS interface~\cite{asis}.  
+
+The four phases of the compiler are sketched in
+figure~\ref{phases}. 
+%
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.010000in}%
+%
+\begingroup\makeatletter
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\endgroup
+\begin{picture}(730,165)(50,575)
+\thinlines
+\put(648,635){\framebox(45,55){}}
+\put(338,635){\dashbox{3}(45,55){}}
+\put(445,670){\circle*{4}}
+\put(460,645){\circle*{4}}
+\put(450,645){\circle*{4}}
+\put(580,655){\circle*{4}}
+\put(590,645){\circle*{4}}
+\put(290,680){\circle*{4}}
+\put(300,670){\circle*{4}}
+\put(135,670){\circle*{4}}
+\put(600,635){\circle*{4}}
+\put(155,670){\circle*{4}}
+\put(150,660){\circle*{4}}
+\put(310,655){\circle*{4}}
+\multiput(435,680)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(435,680)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(425,665)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(425,665)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(445,670)(0.40000,-0.60000){26}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(417,650){\framebox(5,5){}}
+\put(145,680){\circle*{4}}
+\put(427,650){\framebox(5,5){}}
+\multiput(445,670)(-0.22727,-0.68182){23}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(438,650){\framebox(5,5){}}
+\put(465,660){\vector( 1, 0){ 15}}
+\multiput(440,650)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(440,650)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(423,665){\framebox(5,5){}}
+\put(443,635){\framebox(5,5){}}
+\put(420,650){\makebox(0.5556,0.8333){\SetFigFont{10}{12}{rm}.}}
+\multiput(455,650)(-0.50000,-0.50000){11}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(455,650)(0.50000,-0.50000){11}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(453,650){\framebox(5,5){}}
+\put(390,660){\vector( 1, 0){ 15}}
+\put(488,630){\dashbox{3}(45,60){}}
+\multiput(580,655)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(580,655)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(590,645)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(600,635)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(600,635){\makebox(0.5556,0.8333){\SetFigFont{10}{12}{rm}.}}
+\put(432,635){\framebox(5,5){}}
+\multiput(600,635)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(540,650){\vector( 1, 0){ 15}}
+\put(540,670){\vector( 1, 0){ 90}}
+\put(615,650){\vector( 1, 0){ 15}}
+\put(700,660){\vector( 1, 0){ 30}}
+\multiput(290,680)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(290,680)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(280,665)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(280,665)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(300,670)(0.40000,-0.60000){26}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(278,665){\framebox(5,5){}}
+\put(272,650){\framebox(5,5){}}
+\put(282,650){\framebox(5,5){}}
+\multiput(300,670)(-0.22727,-0.68182){23}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(590,645)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(245,660){\vector( 1, 0){ 15}}
+\put(320,660){\vector( 1, 0){ 15}}
+\multiput(295,650)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(295,650)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put(287,635){\framebox(5,5){}}
+\put(298,635){\framebox(5,5){}}
+\put(275,650){\makebox(0.5556,0.8333){\SetFigFont{10}{12}{rm}.}}
+\put(175,660){\vector( 1, 0){ 15}}
+\multiput(145,680)(-0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(145,680)(0.50000,-0.50000){21}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(135,670)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(135,670)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(155,670)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(155,670)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(150,660)(-0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\multiput(150,660)(0.31250,-0.62500){17}{\makebox(0.5556,0.8333){\SetFigFont{7}{8.4}{rm}.}}
+\put( 20,660){\vector( 1, 0){ 30}}
+\put(100,660){\vector( 1, 0){ 15}}
+\put( 52,630){\dashbox{3}(45,60){}}
+\put(195,630){\dashbox{3}(45,60){}}
+%%\put( 10,575){\framebox(730,165){}}
+%
+\put( 70,730){\line( 1, 0){300}}
+\put(370,730){\line( 0,-1){ 30}}
+\put( 70,730){\vector( 0,-1){ 30}}
+%
+\put(230,720){\line( 1, 0){130}}
+\put(360,720){\line( 0,-1){ 20}}
+\put(230,720){\vector( 0,-1){ 20}}
+%
+\put( 80,720){\line( 1, 0){130}}
+\put(210,720){\line( 0,-1){ 20}}
+\put( 80,720){\vector( 0,-1){ 20}}
+%
+\put(435,680){\circle*{4}}
+\put(293,650){\framebox(5,5){}}
+\put(275,640){\vector( 0, 1){ 10}}
+\put(275,640){\line( 1, 0){ 10}}
+\put(420,640){\vector( 0, 1){ 10}}
+\put(420,640){\line( 1, 0){ 10}}
+\put(490,620){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}C}}}
+\put(545,675){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}procedure calls}}}
+\put(500,660){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}GiGi}}}
+\put(195,620){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}Ada}}}
+\put( 55,620){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}Ada}}}
+\put( 57,665){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}Syntax}}}
+\put( 57,650){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}Analysis}}}
+\put(198,665){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}Semantic}}}
+\put(198,650){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}Analysis}}}
+%\put(20,740){\makebox(0,0)[lb]{\smash{\SetFigFont{14}{16.8}{sf}GNAT}}}
+\put(650,620){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}C}}}
+\put(660,665){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}GCC}}}
+\put(340,620){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{9.6}{sf}Ada}}}
+\put(573,608){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}GCC Tree}}}
+\put(572,598){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}fragments}}}
+\put(260,620){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}decorated AST}}}
+\put(405,620){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}expanded}}}
+\put(395,610){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}decorated AST}}}
+\put(340,660){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}expander}}}
+\put(652,650){\makebox(0,0)[lb]{\smash{\SetFigFont{6}{7.2}{sf}back-end}}}
+\end{picture}
+%
+\end{center}
+%
+\caption{\label{phases}Phases of the GNAT compiler.}
+\end{figure}
+
+Subsequent sections describe each of the phases in detail.
+%\begin{description}
+
+%\item[Parser] Cette phase construit un arbre syntaxique
+%abstrait \`a partir duquel il est possible de recr\'eer le fichier
+%source (sauf les commentaires).
+%
+%\item[Semantic Analyzer.] L'analyseur s\'emantique r\'esout les
+%probl\`emes de surcharge, d\'ecore l'arbre avec le type des
+%diff\'erentes entit\'es et v\'erifie la s\'emantique du programme.
+%
+%\item[Expander.] Cette phase est jumel\'ee avec l'analyseur
+%s\'emantique.  Son r\^ole est de simplifier des paradigmes de
+%programmation purement Ada, tels que les aggr\'egats ou le tasking,
+%pour les traduire en instructions plus \'el\'ementaires de fa\c{c}on
+%\`a simplifier la t\^ache de la phase suivante.  Ce module aussi bien
+%que les trois pr\'ec\'edents sont \'ecrits en Ada.
+%
+%\item[Gigi (GNAT to GNU).]  Le r\^ole de Gigi est d'effectuer
+%l'interface entre GNAT et le dorsal de GCC.  Pour cela, Gigi traverse
+%l'arbre GNAT et g\'en\`ere l'arbre GCC correspondant ainsi que les
+%appels aux routines de g\'en\'eration de code.  Ce module est \'ecrit
+%en {C}.
+
+%\end{description}
+GNAT includes three other modules which are not involved in code generation
+but are an integral part of any Ada compilation system.These are the 
+runtime and tasking executive,  the library manager, and the binder.
+
+%\begin{description}
+
+%\item[The binder.] The binder verifies that the object files submitted to the
+%linker obey all Ada rules concerning order of compilation. The binder
+%uses  dependency information contained in the object files themselves. The
+%binder also establishes an order of elaboration for all units in the program,
+%and builds the main program.
+
+%\item[GNARLI (GNAT run time library Interface).]  The GNAT runtime
+%includes routines for task management and memory management.
+
+%\item[Library management] A chaque corps d'une unit\'e de
+%compilation correspond un fichier objet (un fichier {\tt .o} sous
+%Unix) dans lequel sont stock\'ees les donn\'ees n\'ecessaires \`a
+%l'analyse de liens.  Contrairement \`a ce qui se fait habituellement,
+%cette information n'est pas centralis\'ee dans un fichier.  Cette mise
+%en {\oe}uvre, peu conventionnelle, du mod\`ele de librairie Ada,
+%cohabite bien avec les habitudes du monde GCC et facilite la
+%construction de syst\`emes multi-langages.
+
+%\end{description}
+
+
+%Nous allons passer en revue les diff\'erents modules de GNAT.
+
+
+
+\subsection{Syntax Analysis}
+
+The parser is a hand-coded recursive descent parser. It includes a sophisticated
+error recovery system, which among other things takes indentation into
+account when attempting to correct scope errors. In  our experience, the
+recovery is superior to that of other compilers,  and the parser is remarkably
+stable in the presence of badly mangled programs. All GNU compilers heretofore
+had used LALR(1) parsers generated with Bison (The GNU equivalent of YACC).
+The choice of a handwritten parser at this date may seem surprising, but is
+amply justified by the following:
+
+\begin{description}
+
+\item[Clarity.] The parser follows carefully the grammar given in the
+Ada9X reference manual. (\cite{rm-9x}). This has clear pedagogical advantages,
+but precludes the use of a table-driven parser, given that the grammar 
+as given is not LALR(k).
+ 
+\item[Error messages.] The most important reason is the quality of the
+error reporting. Even in case of serious structural errors,  such as an
+interchange of ``{\tt ;}'' and ``{\tt is}''  between specification and body
+of a subprogram, GNAT generates a precise and intelligible message. Bottom-up
+parsers have serious difficulties with such errors.
+
+\item[Performance.] Even though the overall performance of the system is
+bounded by the speed of the code generator, it does not hurt that the parser
+of GNAT is faster than any table-driven one.
+\end{description}
+
+
+\subsection{Semantic Analysis and Expansion}
+
+These two interlinked phases have the following purpose: 
+
+\begin{description}
+
+\item[Semantic analysis]  performs name and type resolution, decorates the
+AST with various semantic attributes,  and as by-product performs all
+static legality checks on the program.
+
+\item[The expander] modifies the AST in  order to simplify its translation
+into the GCC tree. Most of the expander activity results in 
+the construction of additional AST fragments.  Given that code generation 
+requires that such fragments carry all semantic attributes,  every expansion
+activity must be followed by additional semantic processing on the generated
+tree. This recursive structure is carried further: some predefined operations
+such as exponentiation are defined by means of a generic procedure. The
+expansion of the operation results in the generic instantiation 
+(and corresponding analysis) of this generic procedure. 
+
+\end{description}
+
+There is a further unusual recursive aspect to the structure of
+GNAT. The program library (described in greater detail below) does not
+hold any intermediate representation of compiled units. As a result,
+package declarations are analyzed whenever they appear in a context
+clause.  Furthermore, if a generic unit, or an inlined unit {\tt G},
+is defined in a package {\tt P}, then the instantiation or inlining of
+{\tt G} in the current compilation requires that the body of {\tt P}
+be analyzed as well. Thus the library manager, the parser, and the
+semantic analyzer can be activated from within semantic analysis (note
+the backward arrows in figure~\ref{phases}).
+
+
+\subsubsection{Type Resolution}
+
+Type and overload resolution is performed by means of the well-known two-pass
+algorithm. During the first (bottom-up) pass, each node in a complete context
+is labelled with its type, or if overloaded with the set of possible meanings
+of each overloaded reference. During the second pass, the type imposed by the
+context is used to resolve ambiguities and chose a unique meaning for each
+overloaded identifier in the expression. When resolving a call to a primitive
+operation of a tagged type, the second pass also determines the actual in
+the call that is to serve as controlling argument of the dispatching call. 
+\\
+
+\subsubsection{Expansion Activities}
+
+The modifications performed by the expander are tree transformations that must 
+be applied to those Ada constructs that do not have a close equivalent in C, 
+such as allocators, aggregates, tagged types and dynamic dispatching,  
+and all aspects of the tasking. The expansion phase also simplifies  some
+aspects of semantic analysis which are awkward to perform strictly in  one
+pass, eg. the correct handling of the private part of a package declaration.
+The most important expansions are the following; 
+
+\begin{enumerate}
+
+\item Construction of initialization procedures for record and array types,
+and invocation of these procedures for each object of such a type. This is
+also done for tasks and protected objects.
+
+\item Generic instantiation. Instantiation is always done in-line, so that
+declaration and body of the instance are inserted into the AST at the point
+of instantiation.
+
+\item All tasking operations are transformed into calls to subprograms in
+the run-time system. The recursive mechanisms of GNAT are particularly useful
+here. For example,  consider operations on the attribute {\tt COUNT}. The
+run-time holds the specification of a run-time function that examines the
+corresponding queue. Rather than including the details of such a function
+in the compiler proper, the run-time package is analyzed by the compiler as
+if it had appeared in the context clause of the current compilation.  If the
+function is subject to an {\tt INLINE} pragma, the compiler can perform the
+inlining as well, without forcing the compiler to have detailed information
+about the run-time, and without affecting code quality. Such flexibility
+cannot be achieved with a more conventional compiler organization. Because
+of the speed of the compiler,  the cost of this approach in terms of space
+and time is comparable or cheaper than the conventional approach. 
+
+\end{enumerate}
+
+
+\subsection{Gigi and Code Generation}
+
+The phase labeled Gigi (Gnat to Gnu) interfaces the front-end with the
+GCC code generator.  Gigi traverses the decorated and expanded AST, in
+order to build the corresponding GCC tree, which is then input to the
+code generator proper. More precisely, the activities of GCC tree
+construction and code generation are interspersed, so that after each
+code generation activity, the GCC tree fragment can be discarded.  At
+no time is a full tree built (there is no such notion in GCC).  This
+is in line with the one-pass model of compilation used for C, and is
+memory-efficient.
+
+In order to bridge the semantic gap between Ada and C, several code generation
+routines in GCC have been extended, and others added, so that the burden of
+translation is also assumed by Gigi and GCC whenever it would be awkward or
+inefficient to perform the expansion in the front-end. For example, there are
+code generation actions for exceptions, for variant parts, and for access to
+unconstrained types. As a matter of GCC policy, the code generator is extended
+only when the extension is likely to be of benefit to more than one language.
+
+\subsubsection{Discriminated Records and Dynamic Arrays}
+
+Discriminated records are implemented without hidden pointers: if the position
+of a record component depends on a discriminant (for example if the size of
+a previous component depends of a discriminant) then GCC generates inline
+code to compute the address of the component, rather than storing offsets in
+the object.
+
+the implementation of objects whose size is dynamic makes use of so called
+fat pointers. A fat pointer is a record with two components: a pointer to
+an object, and a pointer to a descriptor that contains bounds information
+on the object. Most accesses to such an object make use of the descriptor. 
+GCC builds fat pointers when needed, for example when passing a composite 
+type in a call to a formal parameter that is an unconstrained type. 
+
+\subsubsection{Exceptions}
+
+The exception mechanism is intended to be usable by all GCC languages
+that have exceptions: Ada, C{\tt ++}, and Modula-3. The mechanism
+should be sufficiently uniform to allow multi-language programs to
+function in the presence of language-specific exceptions and exception
+handlers: for example, an Ada exception may propagate from a C{\tt ++}
+module to an Ada handler. The mechanism should also be zero cost, that
+is to say, there should be no run-time cost attached to the mere
+presence of a handler, only to the actual occurrence of an exception.
+
+The design of exception handling is closely related to the semantics of
+finalization. Recall that on exit from any construct that declares some
+entities, there may be cleanup actions to perform: finalization of
+controlled objects, reclamation of local heap-allocated objects, 
+etc. We implement this sequence of actions by means
+of a single chain that holds all local objects that may require finalization,
+and a single procedure that traverses this chain and invokes the appropriate
+finalization for each object therein. When an exception is raised, the stack
+must be unwound,  and the finalization routines attached to each frame must
+be invoked in turn. The exception manager must be able to locate the
+exception handler, and then repeatedly unstack a frame and invoke its 
+finalization procedure. The exception manager uses two tables for this
+purpose: an unwind table and a handler table.   
+ 
+\begin{description}
+
+\item[Unwind Table.] The linker builds a table of address ranges, each of which
+is either under the control of a given exception handler, or has an attached
+finalization procedure. The table stores the addresses of each. 
+
+\item[Handler table.] This table holds the list of exceptions managed by
+a particular handler. 
+
+\end{description}
+
+The method depends on being able to find, without additional structures, the
+subprogram that contains the instruction that raised an exception. To insure
+that the processing is language-independent, the cleanup procedure is
+parameterless, and only its address needs to be retrievable.
+
+Exception propagation proceeds as follows:
+
+\begin{description}
+
+\item[Locating the handler.] During this phase the exception manager uses the
+PC of the exception-raising instruction to locate the innermost active 
+subprogram that has an applicable handler. This traversal of the stack is
+done without unwinding actions, so that the debugger can be invoked on  the
+offending instruction in its proper context, in case there is no
+applicable handler. 
+
+\item[Cleanup.] In the second phase, stack unwinding takes place,  and the
+unwind table is used to retrieve the cleanup procedures at each step, until
+the exception handler takes control. 
+
+\end{description}
+
+\subsection{Object-Oriented Programming}
+
+One of the most eagerly awaited aspects of Ada9X is its support for
+object-oriented programming. In this section we review briefly the novel
+approach of Ada9X to this important programming paradigm, and some GNAT
+implementation details. We examine in succession the three critical
+notions: inheritance, polymorphism,  and dynamic
+dispatching. 
+
+\subsubsection{\label{inher}Inheritance}
+
+What other object-oriented languages call objects are defined in Ada9X 
+by means of tagged types. A tagged type is a record with a special component,
+called the tag, which governs dispatching. Tagged types can be extended
+with additional components. The notion of type extension, as well as the
+concept of inheritance of operations, are generalisations
+of the Ada83 mechanism of type derivation.  GNAT implements tagged types
+by following closely the implementation of regular records. The expander
+transforms tagged types into records according to the following schema:
+
+\begin{center}
+\begin{minipage}{3in}
+\begin{verbatim}
+type R1 (D1, D2 : Type_D) is tagged
+  record
+     C1, Cn : Type_C;
+  end record;
+
+\end{verbatim}
+\end{minipage}
+\hskip 1cm
+\begin{minipage}{2.5in}
+\begin{verbatim}
+type R1 (D1, D2 : Type_D) is
+  record
+     _tag : Ada.Tags.Tag;
+     C1, Cn : Type_C;
+end record;
+\end{verbatim}
+\end{minipage}
+\end{center}
+%
+Extensions are transformed as follows:
+%
+\begin{center}
+\begin{minipage}{3in}
+\begin{verbatim}
+type R2 (D3, D4 : Type_D) is
+  new R1 (D3, X) with
+    record
+       E1, En : Type_E;
+    end record;
+\end{verbatim}
+\end{minipage}
+%\hskip 1cm
+\begin{minipage}{2.5in}
+\begin{verbatim}
+type R2 (D3, D4 : Type_D) is
+  record
+     _parent : R1 (D3, X);
+     E1, En : Type_E;
+  end record;
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+
+The components {\tt \_parent} and {\tt \_tag} use ``{\tt \_}'' as prefix
+to avoid potential name conflicts with user-defined components.
+After this transformation,  any reference to an inherited component is
+turned into a reference to the embedded {\tt \_parent}. 
+
+\subsubsection{Polymorphism}
+Polymorphism denotes the capability of treating in similar
+fashion objects that belong to a class of types. Classwide types
+serve to denote objects that can belong dynamically to any derivation class. 
+
+{\tt R1'Class} is  a type that is implicitly defined when {\tt R1} is defined,
+and which covers {\tt R1} and all its extensions. All operations on
+{\tt R1} can be applied to a value of type {\tt R1'Class}.
+\\ The implementation of classwide types is delicate, because a value of such
+a type has an indefinite subtype, that is to say an unknown number of
+discriminants and unknown components beyond those inherited from {\tt R1}.
+We have found it convenient to define a classwide type as an extension with
+unknown typeless storage. For instance, when the expression {\tt
+new R1'Class (V)} is encountered,   GNAT will the foloowing type
+
+\begin{center}
+\begin{minipage}{4in}
+\begin{verbatim}
+type R1__Class_Subtype is record
+   _parent : R1 (V.D1, V.D2);
+   _extension : Array_Of_Bits (1 .. V'Size - R1'Size);
+end record;
+\end{verbatim}
+\end{minipage}
+\end{center}
+ 
+There is another delicate point concerning the implementation of classwide
+types. All members of the class must have a compatible layout,  so that
+offsets of corresponding components must be identical. This conflicts with
+the need to place discriminants at fixed offsets,  usually at the beginning
+of the record,  so as to be able to calculate the placement of components
+that depend on those discriminants. If any descendant can add new discriminants
+to a tagged type,  it is not possible to make discriminants contiguous. 
+Figure~\ref{c1} shows the layout for the types of the previous example:
+we are forced to place {\tt D3} and {\tt
+D4} between {\tt \_parent} and the components {\tt E1}, {\tt En}.
+
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.007500in}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\fi\endgroup
+\begin{picture}(435,384)(60,420)
+\thinlines
+\put( 60,740){\line( 1, 0){ 60}}
+\put( 60,700){\line( 1, 0){ 60}}
+\put( 60,580){\framebox(60,200){}}
+\put( 60,660){\line( 1, 0){ 60}}
+\put( 60,620){\line( 1, 0){ 60}}
+\put( 80,755){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_tag}}}
+\put( 80,715){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D1}}}
+\put( 80,677){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D2}}}
+\put( 80,634){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}C1}}}
+\put( 80,596){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Cn}}}
+\put(405,740){\line( 1, 0){ 60}}
+\put(405,700){\line( 1, 0){ 60}}
+\put(405,580){\framebox(60,200){}}
+\put(405,660){\line( 1, 0){ 60}}
+\put(405,620){\line( 1, 0){ 60}}
+\put(425,755){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_tag}}}
+\put(425,715){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D1}}}
+\put(425,677){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D2}}}
+\put(425,634){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}C1}}}
+\put(425,596){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Cn}}}
+\put(475,735){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_}}}
+\put(475,717){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}p}}}
+\put(475,699){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}a}}}
+\put(475,681){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}r}}}
+\put(475,663){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}e}}}
+\put(475,645){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}n}}}
+\put(475,627){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}t}}}
+\put(220,740){\line( 1, 0){ 60}}
+\put(220,700){\line( 1, 0){ 60}}
+\put(220,580){\framebox(60,200){}}
+\put(220,660){\line( 1, 0){ 60}}
+\put(220,620){\line( 1, 0){ 60}}
+\put(240,755){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_tag}}}
+\put(240,715){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D1}}}
+\put(240,677){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D2}}}
+\put(240,634){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}C1}}}
+\put(240,596){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Cn}}}
+\put(290,750){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_}}}
+\put(290,732){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}p}}}
+\put(290,714){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}a}}}
+\put(290,696){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}r}}}
+\put(290,678){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}e}}}
+\put(290,660){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}n}}}
+\put(290,642){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}t}}}
+\put(400,580){\line( 1, 0){ 95}}
+\put(400,580){\framebox(95,205){}}
+\multiput(400,580)(0.00000,-8.00000){18}{\line( 0,-1){  4.000}}
+\multiput(400,440)(8.26087,0.00000){12}{\line( 1, 0){  4.130}}
+\multiput(495,440)(0.00000,8.00000){18}{\line( 0, 1){  4.000}}
+\multiput(120,740)(4.54545,0.00000){23}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,740)(4.54545,0.00000){23}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,740)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,700)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,660)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,620)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,580)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(120,780)(12.50000,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\put(280,780){\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(280,780)(12.50000,0.00000){11}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(310,740)(11.87500,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(310,700)(11.87500,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(310,660)(11.87500,0.00000){9}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(280,620)(12.50000,0.00000){11}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\multiput(280,580)(12.50000,0.00000){11}{\makebox(0.1852,1.2963){\SetFigFont{5}{6}{rm}.}}
+\put(215,420){\framebox(95,365){}}
+\put(215,580){\line( 1, 0){ 95}}
+\put(215,540){\line( 1, 0){ 95}}
+\put(215,500){\line( 1, 0){ 95}}
+\put(215,460){\line( 1, 0){ 95}}
+\put( 80,795){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}R1}}}
+\put(255,795){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}R2}}}
+\put(435,795){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}R1'Class}}}
+\put(240,555){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D3}}}
+\put(240,515){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D4}}}
+\put(240,475){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}E1}}}
+\put(240,435){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}En}}}
+\put(415,520){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_extension}}}
+\end{picture}
+\caption{\label{c1} Storage for classwide types}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Dynamic Dispatching}
+
+Primitive operations that are inherited by a type extension can be
+redefined, in which case the new definition overrides the old one.
+When a primitive operation of the root type is applied to a classwide
+argument, the tag of the argument determines the implementation of the
+operation which is to be executed, i.e. the original operation or one
+of its overridings. The tag is implemented as a pointer to a dispatch
+table. The table contains pointers to the primitive operations of the
+type.  There is one table for each tagged type, and the layout of all
+types in a derivation class is compatible, in the sense that different
+overridings of the same operation appear in the same table
+position. Note that in Ada terms this table is not an array, because
+each component is an access to a subprogram with a different
+profile. A call to a primitive operation is dispatching if the
+specific type of its tagged arguments cannot be determined
+statically. In such a case, the tag of one of the actuals is chosen to
+determine which subprogram to call. Simplifying somewhat,if we
+consider type {\tt R1} introduced in section~\ref{inher} and we
+encounter
+ %
+\centerline{\tt Primit\_n (Param: R1'Class)}
+ %
+then  dispatching amounts to replacing:
+
+\centerline{{\tt Primit\_n (X)} $\;\;\;\;$   with $\;\;\;\;$
+{\tt X.\_tag.all.Access\_Primit\_n.all (X)}}
+%
+The layout of the dispatch table is shown in Figure~\ref{c2}.
+The first two components of the table simplify the implementation of
+the membership operation for tagged types.
+
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.007500in}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\fi\endgroup
+\begin{picture}(430,267)(50,540)
+\thinlines
+\put( 60,740){\line( 1, 0){ 60}}
+\put( 60,700){\line( 1, 0){ 60}}
+\put( 60,580){\framebox(60,200){}}
+\put( 60,660){\line( 1, 0){ 60}}
+\put( 60,620){\line( 1, 0){ 60}}
+\put( 80,755){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}\_tag}}}
+\put( 80,715){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D1}}}
+\put( 80,677){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}D2}}}
+\put( 80,634){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}C1}}}
+\put( 80,596){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Cn}}}
+\put(220,740){\line( 1, 0){120}}
+\put(220,700){\line( 1, 0){120}}
+\put(220,660){\line( 1, 0){120}}
+\put(220,620){\line( 1, 0){120}}
+\put(220,580){\line( 1, 0){120}}
+\put(220,540){\framebox(120,240){}}
+\put(400,700){\framebox(80,80){}}
+\thicklines
+\put(115,760){\vector( 1, 0){105}}
+\put(335,715){\vector( 1, 1){ 65}}
+\put( 50,795){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}objet of type R1}}}
+\put(215,795){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}dispatch table
+ for R1}}}
+\put(240,760){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}distance from }}}
+\put(260,747){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}root}}}
+\put(220,716){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}tags of ancestors}}}
+\put(339,675){\vector( 1, 0){30}}
+\put(339,556){\vector( 1, 0){30}}
+\put(339,596){\vector( 1, 0){30}}
+\put(339,636){\vector( 1, 0){30}}
+\put(229,675){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Access\_Primit\_1}}}
+\put(225,556){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Access\_Primit\_n}}}
+\put(225,596){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}$\cdots\cdots\cdots\cdots$}}}
+\put(225,636){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}Access\_Primit\_2}}}
+\put(410,765){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}table for}}}
+\put(410,747){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}ancestor}}}
+\put(426,729){\makebox(0,0)[lb]{\smash{\SetFigFont{8}{8.4}{sf}tags}}}
+\end{picture}
+\caption{\label{c2}}
+\end{center}
+\end{figure}
+
+\subsection{The Runtime: GNARL}
+
+
+The most important activities of the run-time have to do with task
+management: creation, activation, rendez-vous, termination. The runtime
+maintains the data structures needed to manage, schedule, and synchronize
+tasking activities. In order to make GNAT easily portable,  the runtime
+is written in Ada (with some very small assembly glue) and two procedural
+interfaces, GNARLI and GNULLI, are used to isolate 
+the compiler from the runtime,  and the
+runtime from the underlying operating system.
+
+GNARLI (GNAT run-time library interface) is the interface between the
+compiler and the run-time. Each Ada construct that applies to tasks or
+protected objects is implemented by one or more subprograms in the
+run-time. The expander transforms each occurrence of such constructs
+into the corresponding series of calls. The packages that constitute
+the run-time are treated as any other unit of the context of the
+compilation, and analyzed when needed. This obviates the need to place
+run-time information in the compiler itself, and allows a
+knowledgeable user to modify the run-time if he/she so chooses. The
+design of GNARL is based on the CARTS (Common Ada Run-Time System)
+specification~\cite{gnarl}.
+
+GNULLI (GNAT low-level library interface) provides the interface between
+the run-time and the underlying operating system. The design of GNULLI
+makes use of a few POSIX threads primitives, and assumes the existence of
+such primitives in the host OS. A threads package that emulates those
+primitives is supplied for systems that do not have them, e.g. conventional
+Unix systems. Otherwise the implementation of GNULLI is straightforward
+on modern operating systems such as  Solaris, Mach and OS/2.
+\\
+The design and implementation of GNARL have been carried out at Florida
+State University by the group directed by Ted Baker and Ted
+Giering, and follows their design of previous protable Ada runtimes, 
+notably CARTS and MRTSI.
+
+\subsection{Library Management}
+
+The notion of program library is seen justifiably as one of the fundamental
+contributions of Ada to software engineering. The library guarantees that
+type safety is maintained across compilations,  and prevents the construction
+of inconsistent systems by excluding obsolete units. In  all Ada compilers
+to date, the library is a complex structure that holds intermediate 
+representations of compiled units, information about dependences between
+compiled units, symbol
+tables, etc. The ARM strongly suggests that such a structure is mandatory,
+but in fact a monolithic library is not required to implement rigorously 
+the semantics of separate compilation. Furthermore,  the monolithic library
+approach is ill-adapted to multi-language systems, and has been responsible
+for some of the awkwardess of interfacing Ada to other languages.
+
+We have chosen a completely different approach in GNAT. The library itself
+is implicit, and object files depend only on the sources used to
+compile them, and not on other objects.  There are no intermediate
+representations of compiled units, so that the declarations of the units
+appearing in the context clause of a given compilation are always analyzed
+anew. Dependency information is kept directly in the object files, and
+amounts to a few hundred bytes per unit. The binder can be used to
+verify the consistency of a system before linking, and is also used
+to determine the order of elaboration.  Given the speed of the front-end,
+our approach is no less efficient than the conventional library mechanism,
+and has three important advantages over it:
+
+\begin{enumerate}
+
+\item Compilation of an Ada unit is identical to compilation of a
+module or file in another language: the result of the compilation of one
+source is one object file,  period. 
+
+\item Given that object files only depend on sources, not on other objects,
+there is no longer a required order of compilation. All the components of
+a system can be compiled in any order. Only the modification of a source
+program may obsolete a compiled unit. A well-known dreaded phenomenon of
+previous Ada systems, namely the accidental recompilation of one unit that
+obsoletes a slew of other units in the library, even when the source is
+unchanged, is thus avoided completely.
+
+\item Inlining works in a much more flexible way than in  normal compilers.
+Given that compiling, and thus inlining,  is always done from the source,
+there is no requirement that the entities to be inlined should be compiled
+first. It is even possible for two bodies to inline functions defined in 
+each other, without fear of circularities. 
+
+\end{enumerate}
+
+It is gratifying that this flexible model is fully conformant with
+the prescribed semantics given in the ARM,  and at the same
+time confortable for 
+programmers used to the behavior of {\tt make} and similar tools. The
+GNAT model simplifies the construction of multi-language programs and
+makes Ada look more familiar to programmers in other languages. 
+
+\subsection{The Binder }
+The role of the binder is twofold:
+
+\begin{itemize}
+
+\item It verifies the consistency of the objects that are to be assembled
+into an executable. 
+
+\item It determines a valid order of elaboration for the units in the
+program, and packages the calls to the corresponding elaboration procedures
+into a single subprogram, to be invoked before the main program.
+ 
+\end{itemize}
+
+The binder makes use of the information created when each unit is
+compiled. This information includes the semantic dependencies of each unit,
+the date of latest modification of their sources, the presence of various
+elaboration pragmas, and whether a given unit may be a main program. 
+
+The binder has been designed with flexibility in mind. In  one mode, it
+can verify that all objects depend on a consistent set of sources. 
+Given that time stamps of the sources used for a compilation
+are kept in the object files, this check does not require that
+sources themselves be present, which is an  advantage in 
+commercial settings for software distribution.
+ 
+Another mode of operation is to verify that the system is up-to-date, that
+is to say that no source was modified after compilation. In  all cases,
+possible inconsistencies are diagnosed and treated as fatal errors. There
+are however cases in which this is undesirable. For example,  it is
+irritating to be forced to recompile a large system only because comments
+were added to a low-level package on  which many units depend.
+An additional option instructs the binder to ignore time stamps and create
+an elaboration procedure unconditionally. Such an option requires precise
+understanding on the part of the user,  and is certainly not safe,  but it
+may be indispensable in certain circumstances, and will be welcome by
+experienced programmers.
+
+Finally, the binder is intended to work with other GCC languages, and
+can produce different output programs. By default,  the object file
+given as input is taken to be the main program. In this case,  the
+binder builds a C file containing the function {\tt main}, which is the
+mandatory main program for a C compilation. This function consists of
+a series of calls to elaboration procedures,  followed by a call to the main
+Ada program. The intended main program may not even be in Ada,  in which
+case the binder output consists solely of the elaboration calls.
+
+\section{Conclusion}
+
+Compiler quality means different things to different users.  For students
+and beginners,  GNAT intends to be user-friendly,  provide lucid error
+messages, and fast turn-around for small programs.  For a software engineer,
+code quality is paramount, and GNAT can rely on the proven performance of
+the GCC back-end. For the embedded-systems developer,  the existence of
+cross-compilation tools is critical,  and here as well GCC provides the
+necessary functionality. For the language researcher and the compiler
+writer, the existence of sources of a full compiler is invaluable. 
+
+GNAT has no size limitation,  beyond that imposed by the full memory of the
+host machine. The speed of the system is substantial: on a 66-Mhz i486
+machine, the front-end runs at 40,000 lines/min.,  and the full compiler
+at 8,000 lines/min. Such a performance is comparable to that of the best
+commercial compilers, and is likely to improve by a factor of two when
+various tracing options are removed and full inlining is supported. 
+
+To date (Dec. 1993) GNAT is sufficiently complete and robust to compile
+itself (around 110,000 lines of Ada), compile GNARL, and pass hundreds
+of ACVC tests. Nevertheless, given the size and complexity of Ada9X, we know
+that a few person/years are still required to complete the task. 
+In  spite of its incompleteness, the GNAT system already has a 
+small but dedicated set of users. The cooperative spirit fostered by the
+activities of the Free Software Foundation is striking: days after the
+first release of GNAT, several ports to unexpected machines were reported,
+and offers were made to the project of important software components:
+bindings to Mach,  to X-windows, implementation of the information systems
+annex, etc. This synergy within the Ada community is a rewarding byproduct
+of the GNAT project.
+
+\section{Appendix: How to Obtain GNAT}
+
+GNAT is available by anonymous ftp from cs.nyu.edu, directory pub/gnat.
+This directory contains a README file, sources files,  and binaries for
+OS/2 and for Sparc/SunOS. Installation on other targets currently requires
+that GCC already be installed.
+\\
+A mailing list is maintained at New York University
+to notify users of new version releases. Send mail to gnat-reque@cs.nyu.edu
+to be included in this list.
+\\
+Users are invited to submit bug reports to gnat-report@cs.nyu.edu. 
+Information on new ports, on enhancements to the compiler, as well as
+other software contributions, are welcomed at the same electronic address. 
+
+\pagebreak
+
+{\bf Acknowledgements.} The work we have described is the result of the
+collective efforts of the GNAT team, and we thank all of them for the
+pleasure of working together. We thank Richard Stallman, not only for the
+GCC system, but for his seminal insight that the Ada library model could
+be source-based. We also want to thank
+Ted Baker (Florida State University), Bruno Leclerc (T\'el\'ecom
+Bretagne), and Tucker Taft (Intermetrics) for innumerable 
+advice and discussions. 
+
+\begin{thebibliography}{10}
+
+\bibitem{asis}
+{\sc J.B.Bladen et al.}, {\it Ada Semantic Interface Specification (ASIS)},
+Conference Proceedings,  TriAda'91, San Jose,California,  October 1991.
+
+\bibitem{rm-9x}
+{\sc Ada9X Mapping/Revision Team}, {\it Programming Language
+Ada--Language and Standard Libraries}, Draft, Version 4.0,
+Intermetrics, September 1993.
+
+\bibitem{gnarl}
+{\sc T.P.Baker, and E.W.Giering, III}, {\it Implementing
+Ada9X features using POSIX threads: design issues}, Conference
+Proceedings, TriAda'93, Seattle, Washington, September 1993.
+
+\bibitem{diana}
+{\sc G.Goos, W.A.Wulf, A.Evans, Jr., and K.J.Butler}, {\it DIANA -
+An Intermediate Language for Ada},
+Lecture Notes in Computer Science, number 161, Springer-Verlag, 1983.
+
+%\bibitem{ada-ed}
+%{\sc P.Kruchten, and E.Schonberg}, {The Ada/Ed System: A
+%Large-Scale Experiment in Software Prototyping Using SETL}, dans {\it
+%Approaches to Prototyping}, Springer-Verlag, 1983, pp 398--415.
+
+\bibitem{gnu-manual}
+{\sc R.M.Stallman}, {\it Using and Porting GNU CC}, Free Software
+Foundation, December 1992.
+
+
+\end{thebibliography}
+
+\end{document}
+
+

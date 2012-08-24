@@ -1,0 +1,159 @@
+This is TeX, Version 3.1415 (C version 6.1) (format=lplain 95.2.10)  17 JUN 1995 13:06
+**gnatdoc1.tex
+(gnatdoc1.tex
+LaTeX2e <1994/12/01>
+(/usr/local/lib/texmf/tex/latex2e/base/latex209.def
+File: latex209.def 1994/11/28 v0.39 Standard LaTeX file
+
+Entering LaTeX 2.09 compatibility mode.
+\footheight=\dimen102
+\@maxsep=\dimen103
+\@dblmaxsep=\dimen104
+(/usr/local/lib/texmf/tex/latex2e/base/tracefnt.sty
+Package: tracefnt 1994/11/18 v2.3m Standard LaTeX package (font tracing)
+\tracingfonts=\count82
+LaTeX Info: Redefining \selectfont on input line 101.
+)
+\symbold=\mathgroup4
+\symsans=\mathgroup5
+\symtypewriter=\mathgroup6
+\symitalic=\mathgroup7
+\symsmallcaps=\mathgroup8
+\symslanted=\mathgroup9
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 200.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 201.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 202.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 208.
+LaTeX Info: Redefining \em on input line 218.
+
+(/usr/local/lib/texmf/tex/latex2e/base/latexsym.sty
+Package: latexsym 1994/09/25 v2.1f Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 47.
+)
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 283.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 285.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 287.
+)
+(/usr/local/lib/texmf/tex/latex2e/base/article.cls
+Document Class: article 1994/12/09 v1.2x Standard LaTeX document class
+(/usr/local/lib/texmf/tex/latex2e/base/size11.clo
+File: size11.clo 1994/12/09 v1.2x Standard LaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+Compatibility mode: definition of \rm ignored.
+Compatibility mode: definition of \sf ignored.
+Compatibility mode: definition of \tt ignored.
+Compatibility mode: definition of \bf ignored.
+Compatibility mode: definition of \it ignored.
+Compatibility mode: definition of \sl ignored.
+Compatibility mode: definition of \sc ignored.
+LaTeX Info: Redefining \cal on input line 455.
+LaTeX Info: Redefining \mit on input line 456.
+\bibindent=\dimen105
+) (gnatdoc1.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 67.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 67.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 67.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 67.
+
+(/usr/local/lib/texmf/tex/latex2e/base/Ulasy.fd
+File: Ulasy.fd 1994/09/25 v2.1fLaTeX symbol font definitions
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 67.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 67.
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--94
+
+ []
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 94.
+
+Overfull \hbox (14.09998pt too wide) in paragraph at lines 94--95
+ [] 
+ []
+
+[1
+
+] (gnatdoc1.toc)
+\tf@toc=\write3
+
+Overfull \hbox (27.44998pt too wide) in paragraph at lines 109--110
+[][] 
+ []
+
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 138--169
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 138--169
+
+ []
+
+[3]
+Overfull \hbox (36.76349pt too wide) in paragraph at lines 296--298
+ [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 207--321
+
+ []
+
+[4]
+Overfull \hbox (93.65173pt too wide) in paragraph at lines 468--470
+ [] 
+ []
+
+[5] [6]
+Underfull \hbox (badness 10000) in paragraph at lines 597--606
+
+ []
+
+[7] [8] [9] [10]
+Overfull \hbox (21.34915pt too wide) in paragraph at lines 831--831
+[]   \OT1/cmtt/m/n/10.95 _extension : Array_Of_Bits (1 .. V'Size - R1'Size);[] 
+
+ []
+
+[11] [12] [13] [14] [15] [16] [17] (gnatdoc1.aux) ) 
+Here is how much of TeX's memory you used:
+ 443 strings out of 10953
+ 4547 string characters out of 72769
+ 88758 words of memory out of 262141
+ 3284 multiletter control sequences out of 9500
+ 20430 words of font info for 74 fonts, out of 100000 for 255
+ 14 hyphenation exceptions out of 607
+ 22i,9n,27p,163b,320s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on gnatdoc1.dvi (17 pages, 81348 bytes).

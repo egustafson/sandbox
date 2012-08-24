@@ -1,0 +1,20 @@
+\contentsline {section}{\numberline {1}Introduction: Ada9X and the GNAT Project}{3}
+\contentsline {section}{\numberline {2}GCC: An Industrial-Strength Compiler}{4}
+\contentsline {section}{\numberline {3}The Organization of GNAT}{4}
+\contentsline {subsection}{\numberline {3.1}Introduction}{4}
+\contentsline {subsection}{\numberline {3.2}Syntax Analysis}{6}
+\contentsline {subsection}{\numberline {3.3}Semantic Analysis and Expansion}{7}
+\contentsline {subsubsection}{\numberline {3.3.1}Type Resolution}{7}
+\contentsline {subsubsection}{\numberline {3.3.2}Expansion Activities}{7}
+\contentsline {subsection}{\numberline {3.4}Gigi and Code Generation}{8}
+\contentsline {subsubsection}{\numberline {3.4.1}Discriminated Records and Dynamic Arrays}{9}
+\contentsline {subsubsection}{\numberline {3.4.2}Exceptions}{9}
+\contentsline {subsection}{\numberline {3.5}Object-Oriented Programming}{10}
+\contentsline {subsubsection}{\numberline {3.5.1}Inheritance}{10}
+\contentsline {subsubsection}{\numberline {3.5.2}Polymorphism}{11}
+\contentsline {subsubsection}{\numberline {3.5.3}Dynamic Dispatching}{11}
+\contentsline {subsection}{\numberline {3.6}The Runtime: GNARL}{12}
+\contentsline {subsection}{\numberline {3.7}Library Management}{13}
+\contentsline {subsection}{\numberline {3.8}The Binder }{14}
+\contentsline {section}{\numberline {4}Conclusion}{15}
+\contentsline {section}{\numberline {5}Appendix: How to Obtain GNAT}{16}
