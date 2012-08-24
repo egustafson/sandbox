@@ -1,0 +1,77 @@
+
+LOADLVL=/home/ericg/mgload/login_high_water
+LOADDIR=/home/ericg/mgload/login
+
+OVERLOADMSG="CLI sessions have exceeded the maximum configured."
+OVERLOADTIME=5 # seconds
+
+DEFAULTLOADMAX=20 # sessions
+
+get_load () {
+
+    if [ ! -d $LOADDIR ]; then mkdir -p $LOADDIR; fi
+    files=`find $LOADDIR -type f`
+    ii=0
+    for f in $files; do ii=$(($ii+1)); done
+    
+    return $ii
+}
+
+audit_load() {
+
+    LOGIN_PIDS=`ps ax | grep "mgload" | grep -v grep | sed -e 's,^\W*,,;s,\W\W*\w\w*,,g;s,/,,g;s,-,,g'`
+
+    FILE_PIDS=`cd $LOADDIR; find . -type f | sed -e 's,^\./,,'`
+
+    for f in $FILE_PIDS
+    do 
+      for p in $LOGIN_PIDS 
+      do
+        if [ $f -eq $p ]; then continue 2; fi
+      done
+      rm -f $LOADDIR/$f
+    done
+}
+
+manage_load() {
+
+    if [ -f $LOADLVL ]; then
+        LOADMAX=`cat $LOADLVL`
+        if [ $LOADMAX -lt 0 ]; then return; fi
+    else
+        LOADMAX=$DEFAULTLOADMAX
+    fi
+
+    get_load
+    load=$?
+
+    if [ $load -ge $LOADMAX ]
+    then
+        audit_load
+        get_load
+        load=$?
+    fi
+
+    if [ $load -ge $LOADMAX ]
+    then
+        echo $OVERLOADMSG
+        sleep $OVERLOADTIME
+        exit
+    fi
+
+    echo "" > $LOADDIR/$$
+}
+
+
+# ----------
+
+manage_load
+echo "Load below high water mark"
+
+sleep 20
+
+echo "$$ exiting"
+
+rm -f $LOADDIR/$$
+
+
