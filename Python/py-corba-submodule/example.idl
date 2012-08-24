@@ -1,0 +1,3 @@
+module mod {
+    const string s = "Example String.";
+};

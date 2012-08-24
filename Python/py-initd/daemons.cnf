@@ -1,0 +1,6 @@
+# Comment
+
+child-1: stubDaemon.py a b c
+child-2: stubDaemon.py x y z
+bogus
+runaway: ls -l

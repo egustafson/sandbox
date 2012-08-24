@@ -1,0 +1,6 @@
+INFO     (2009-05-22 14:47:38,099)[19533] - Logging Started
+DEBUG    (2009-05-22 14:47:38,100)[19533] - debug message
+INFO     (2009-05-22 14:47:38,101)[19533] - info message
+WARNING  (2009-05-22 14:47:38,102)[19533] - warn message
+ERROR    (2009-05-22 14:47:38,102)[19533] - error message
+CRITICAL (2009-05-22 14:47:38,104)[19533] - fatal message

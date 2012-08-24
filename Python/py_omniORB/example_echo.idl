@@ -1,0 +1,6 @@
+// echo_example.idl
+module Example {
+  interface Echo {
+    string echoString(in string mesg);
+  };
+};

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec omniNames -logdir /usr/home/ericg/exper/python_omniORB/omninames

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<configuration>
+  <module name="mod1">
+    <parameter name="p1">p1-value</parameter>
+    <parameter name="p2">p2-value</parameter>
+  </module>
+  <module name="mod2">
+    <parameter name="param2a">Module 2, parameter A</parameter>
+  </module>
+</configuration>

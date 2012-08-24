@@ -1,0 +1,6 @@
+The objective of this exercise is to create a Python/omniORB based servant that sits
+on a fixed, and predetermined port.  Then, the will be given the corbaname for that
+IOR and contact the servant.  The goal is to specifically circumvent using the 
+Name Service, but to provide a service that is reachable at a well known (IOR) address.
+
+The follow on is to use this method to create an SSL only environment.

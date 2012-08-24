@@ -1,0 +1,7 @@
+module ex {  // Example
+
+    interface servant {
+        void ping();
+        void shutdown();
+    };
+}; // module ex
