@@ -1,0 +1,2 @@
+all :
+	gnatmake main
