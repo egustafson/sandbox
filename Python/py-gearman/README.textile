@@ -1,11 +1,12 @@
 h1. Gearman Python Example
 
-h2. Install Gearman & Python Library
 p(. (Ubuntu - Precise [12.04])
+
+h3. Install Gearman & Python Library
 
 bc. sudo apt-get install gearman python-gearman
 
-h2. Author the Client & Worker
+h3. Author the Client & Worker
 
 See the code in this directory.
 
