@@ -1,0 +1,9 @@
+h1. Memcached Python Example
+
+p(. (Ubuntu - Precise [12.04])
+
+h3. Install Memcached & Python Library
+
+bc. sudo apt-get install memcached python-memcache
+
+h3. See py-memcache.py for example
