@@ -1,0 +1,13 @@
+h1. RabbitMQ Python Example
+
+p(. (Ubuntu - Quantal [12.10])
+
+h3. Install RabbitMQ Server & Python 'pika' Library
+
+bc. sudo apt-get install rabbitmq-server python-pika
+
+h3. Author Sender & Receiver
+
+See the code in this directory
+
+h3. Run
