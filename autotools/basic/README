@@ -1,0 +1,16 @@
+This is a simple demo for the autotools:
+  * autoconf
+  * automake
+  * libtool  (not represented)
+
+To exercise this example:
+
+  autoreconf --force --install
+  ./configure
+  make
+
+To clean up to the starting point:
+
+  make distclean
+  rm -rf `cat .gitignore`
+
