@@ -1,0 +1,14 @@
+h1. General J2SE Examples
+
+h3. Included Excamples
+
+# Processing argv
+# ThreadPoolExecutor
+# Initializing log4j
+# Java language annotations - creation
+# JavaBeans
+#* Creation
+#* BeanSupport
+#* BeanEditor ...
+# XML <--> JavaBean persistence (w/ XPath)
+# Read/Write XML DOM
