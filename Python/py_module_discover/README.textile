@@ -1,0 +1,6 @@
+Experimentation with 'auto' discovery of python modules.
+
+Goal:  Drop "plug-in" modules in a pre-specified directory and have
+Python code discover the plugin's and start using them.  (Or make them
+available at runtime as part of a catalog of extensions.)
+

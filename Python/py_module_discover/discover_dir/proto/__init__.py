@@ -1,0 +1,2 @@
+
+print("Package 'proto' initialized.")
