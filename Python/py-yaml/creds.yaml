@@ -1,0 +1,23 @@
+creds:
+    user-os:
+        user: user@example.com
+        pass: xyzzy
+        type: openstack
+        identity: https://identity.example.com:3210/
+        catalog:
+            - type: custom-service
+              endpoints:
+                  publicURL: http://custom.svc.example.com/v1/
+                  versionId: "1"
+
+    dev-role-aws:
+        user: developer@example.com
+        access-key: "123456789098"
+        secret:     asdfghjklqwertyuiop
+        type: aws
+
+    prod-role-os:
+        user: production@example.com
+        paas: 1a2b3c
+        type: openstack
+        identity: https://id.example.com:3333/
