@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+
+import ex_module
+import ex_pkg1
+import ex_pkg2
+
+print("done.")
+
+
+
+
+## Local Variables:
+## mode: python
+## End:
