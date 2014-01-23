@@ -8,13 +8,13 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.stereotype.Component;
 
 @Component
-@Path("/example")
+@Path("/complex")
 @Produces(MediaType.APPLICATION_JSON)
-public class ExampleResource {
+public class ComplexJsonResponse {
 
   @GET
-  public ExampleRepresentation doGet() {
-    return new ExampleRepresentation();
+  public ComplexJsonRecord doGet() {
+    return new ComplexJsonRecord();
   }
   
 }
