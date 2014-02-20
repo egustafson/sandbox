@@ -5,21 +5,48 @@
   <artifactId>thymeleaf-spring</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>thymeleaf-spring Maven Webapp</name>
-  <url>http://maven.apache.org</url>
+  <name>thymeleaf-spring</name>
+
+  <properties>
+    <java.version>1.7</java.version>
+    <javax.servlet.version>3.0.1</javax.servlet.version>
+    <spring.version>4.0.0.RELEASE</spring.version>
+    <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
+    
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${javax.servlet.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
-      <version>4.0.0.RELEASE</version>
+      <version>${spring.version}</version>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf-spring4</artifactId>
-      <version>2.1.2.RELEASE</version>
+      <version>${thymeleaf.version}</version>
     </dependency>
   </dependencies>
+
   <build>
     <finalName>thymeleaf-spring</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
+
 </project>

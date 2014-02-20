@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ExampleController {
 
-    @RequestMapping("/example")
+    @RequestMapping("/thymeleaf")
     public String response() {
         return "example-view";
     }
