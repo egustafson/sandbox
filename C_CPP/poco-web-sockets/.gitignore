@@ -1,0 +1,13 @@
+
+## GNU autoconf ignores
+##
+aclocal.m4
+autom4te.cache
+compile
+configure
+install-sh
+missing
+config.h.in
+config.h.in~
+depcomp
+Makefile.in
