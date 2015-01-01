@@ -5,7 +5,7 @@
 bin_PROGRAMS += src/main
 src_main_SOURCES=
 src_main_CPPFLAGS = -I/usr/local/include
-src_main_LDADD    = -L/usr/local/lib -lPocoNet
+src_main_LDADD    = -L/usr/local/lib -lPocoUtil -lPocoJSON -lPocoNet -lPocoXML -lPocoFoundation
 
 src_main_SOURCES += src/main.cpp
 
