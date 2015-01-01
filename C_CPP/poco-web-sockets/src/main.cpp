@@ -2,6 +2,8 @@
  *
  */
 
+#include <Poco/Net/HTTPServer.h>
+
 #include <stdio.h>
 
 #include "config.h"

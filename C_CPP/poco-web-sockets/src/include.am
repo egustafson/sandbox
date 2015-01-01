@@ -1,0 +1,14 @@
+## Included by top level Makefile.am (automake).
+## all paths should be relative to the project root.
+##
+
+bin_PROGRAMS += src/main
+src_main_SOURCES=
+src_main_CPPFLAGS = -I/usr/local/include
+src_main_LDADD    = -L/usr/local/lib -lPocoNet
+
+src_main_SOURCES += src/main.cpp
+
+
+
+## end of include.am

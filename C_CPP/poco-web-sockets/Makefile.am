@@ -1,5 +1,9 @@
-## Makefile.am -- Process this file with automake to produce Makefile.in
+## Makefile.am -- Process this file with automake.
 
-bin_PROGRAMS = main
-main_SOURCES = main.cpp
+# initialze empty so include files can append to them.
+bin_PROGRAMS=
 
+
+include src/include.am
+
+## end of Makefile.am
