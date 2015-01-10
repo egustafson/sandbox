@@ -31,6 +31,8 @@
 #include "Poco/Format.h"
 #include <iostream>
 
+#include "src/PageRequestHandler.h"
+
 using Poco::Net::ServerSocket;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
@@ -52,21 +54,21 @@ using Poco::Util::HelpFormatter;
 #include "config.h"  // from autoconf
 
 
-// PageRequestHandler - return the web page.
-//
-class PageRequestHandler: public HTTPRequestHandler {
-public:
-    void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) {
-        response.setChunkedTransferEncoding(true);
-        response.setContentType("text/html");
-        std::ostream& ostr = response.send();
-        ostr<<"<html>";
-        ostr<<"<body>";
-        ostr<<"Stub (HTML) output - insert JavaScript HERE";
-        ostr<<"</body>";
-        ostr<<"</html>";
-    }
-}; // end class PageRequestHandler
+// // PageRequestHandler - return the web page.
+// //
+// class PageRequestHandler: public HTTPRequestHandler {
+// public:
+//     void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) {
+//         response.setChunkedTransferEncoding(true);
+//         response.setContentType("text/html");
+//         std::ostream& ostr = response.send();
+//         ostr<<"<html>";
+//         ostr<<"<body>";
+//         ostr<<"Stub (HTML) output - insert JavaScript HERE";
+//         ostr<<"</body>";
+//         ostr<<"</html>";
+//     }
+// }; // end class PageRequestHandler
 
 
 // WebSocketRequestHandler - handle the WebSocket connection.
@@ -92,6 +94,7 @@ class RequestHandlerFactory: public HTTPRequestHandlerFactory {
 public:
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
         Application& app = Application::instance();
+        app.logger().information("---");
         app.logger().information("Request from "
                                  + request.clientAddress().toString() + ": " 
                                  + request.getMethod() + " "
@@ -100,7 +103,6 @@ public:
         for (HTTPServerRequest::ConstIterator it = request.begin(); it != request.end(); ++it) {
             app.logger().information(it->first + ": " + it->second);
         }
-        app.logger().information("---");
         if ( request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0) {
             return new WebSocketRequestHandler;
         } else {
@@ -135,7 +137,7 @@ protected:
         ServerSocket svs(port);
         HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
         srv.start();
-        std::cout<<"serving..."<<std::endl;
+        std::cout<<"serving on port ["<<port<<"] ..."<<std::endl;
         waitForTerminationRequest();  // ctrl-c or SIGTERM
         srv.stop();
 

@@ -7,8 +7,10 @@ src_main_SOURCES=
 src_main_CPPFLAGS = -I/usr/local/include
 src_main_LDADD    = -L/usr/local/lib -lPocoUtil -lPocoJSON -lPocoNet -lPocoXML -lPocoFoundation
 
-src_main_SOURCES += src/main.cpp
+noinst_HEADERS+= src/PageRequestHandler.h
 
+src_main_SOURCES+= src/main.cpp
+src_main_SOURCES+= src/PageRequestHandler.cpp
 
 
 ## end of include.am
