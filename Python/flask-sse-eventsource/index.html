@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Python SSE/EventSource Example</title>
+  </head>
+  <body>
+    <h2>Python SSE/EventSource Example</h2>
+    Time: <span id="status">status-stub</span>
+
+    <script type="text/javascript">
+     var eventOutputContainer = document.getElementById("status");
+     var eventSrc = new EventSource("/subscribe");
+
+     eventSrc.onmessage = function(e) {
+       console.log(e.data);
+       eventOutputContainer.innerHTML = e.data;
+     };
+    </script>
+  </body>
+</html>
