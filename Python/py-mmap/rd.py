@@ -12,8 +12,10 @@ if __name__=='__main__':
     print("header size: {}".format(common.HDR_SIZE))
 
     c = JournalConsumer(TEST_FILE)
-    for ii in range(10):
-        ( seq, blob ) = c.next()
-        print("{}: {}".format(seq, blob))
+    while not c.eof():
+        (seq, blob) = c.next()
 
+    print('--')
+    print("Read {} bytes.".format(c.pos()))
+    print("Read {} objects.".format(c.seq()))
     print('done.')
