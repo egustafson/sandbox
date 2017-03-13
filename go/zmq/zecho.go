@@ -5,23 +5,61 @@ import (
 	"log"
 )
 
-func main() {
-	ctx, err := zmq.NewContext()
+var (
+	monitor  = true
+	monAddr  = "inproc://monitor.sock"
+	bindAddr = "tcp://*:5555"
+)
+
+func sockMonitor(addr string) {
+	msock, err := zmq.NewSocket(zmq.PAIR)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer ctx.Term()
-	sock, err := ctx.NewSocket(zmq.PAIR)
+	defer msock.Close()
+	defer log.Print("sockMonitor() - exited")
+	err = msock.Connect(addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print("-Tracing socket events")
+	for {
+		event, addr, val, err := msock.RecvEvent(0)
+		if err != nil {
+			log.Print(err)
+			break
+		}
+		log.Printf("- event(%d) @%s [val: %d]", event, addr, val)
+	}
+}
+
+func main() {
+
+	// create the primary socket for communicating.
+	sock, err := zmq.NewSocket(zmq.PAIR)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sock.Close()
-	err = sock.Bind("tcp://*:5555")
+
+	// configure socket "monitoring"
+	if monitor {
+		err = sock.Monitor(monAddr, zmq.EVENT_ALL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		go sockMonitor(monAddr)
+	}
+
+	// bind and accept connection(s)
+	log.Printf("binding to: %s", bindAddr)
+	err = sock.Bind(bindAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Loop forever
+	log.Print("serving echo() forever ...")
 	for {
 		msg, err := sock.Recv(0)
 		if err != nil {
