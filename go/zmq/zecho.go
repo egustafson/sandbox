@@ -29,7 +29,7 @@ func sockMonitor(addr string) {
 			log.Print(err)
 			break
 		}
-		log.Printf("- event(%d) @%s [val: %d]", event, addr, val)
+		log.Printf("- event(%s) @%s [val: %d]", event, addr, val)
 	}
 }
 
