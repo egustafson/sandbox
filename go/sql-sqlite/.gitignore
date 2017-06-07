@@ -1,0 +1,5 @@
+# local artifacts
+sql-sqlite
+#
+# db file that's generated -- ignore
+stub.db
