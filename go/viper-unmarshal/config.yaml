@@ -1,0 +1,12 @@
+simple:
+  key1: value1
+  key2: value2
+  key3: 123
+complex:
+  name: complex-name
+  ts: 1234567890
+  val: 1.201E+4
+  tags:
+    t1: tag-value-1
+    t2: tag-value-2
+    t3: tag-value-3
