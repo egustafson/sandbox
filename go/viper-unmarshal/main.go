@@ -19,6 +19,12 @@ type Complex struct {
 	Tags map[string]string `json:"tags"`
 }
 
+type VecElem struct {
+	Name string            `json:"name"`
+	Val  string            `json:"val"`
+	Tags map[string]string `json:"tags"`
+}
+
 func main() {
 
 	viper.SetConfigName("config")
@@ -35,6 +41,10 @@ func main() {
 	var c Complex
 	viper.UnmarshalKey("complex", &c)
 	fmt.Printf("Complex:\n%v\n", c)
+
+	var v []VecElem
+	viper.UnmarshalKey("vec", &v)
+	fmt.Printf("Vec:\n%v\n", v)
 }
 
 func (s Simple) String() string {

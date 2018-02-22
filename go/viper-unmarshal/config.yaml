@@ -10,3 +10,15 @@ complex:
     t1: tag-value-1
     t2: tag-value-2
     t3: tag-value-3
+
+vec:
+  - name: vec-elem-1
+    val: value-1
+    tags:
+      t1: v1-t1
+      t2: v1-t2
+  - name: vec-elem-2
+    val: value-2
+    tags:
+      t1: v2-t1
+      t2: v2-t2
