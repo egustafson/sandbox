@@ -1,5 +1,10 @@
 package main
 
+/* the Viper package appears to use 'mapstructure' internally
+ *  GitHub: https://github.com/mitchellh/mapstructure
+ *  Docs:   https://godoc.org/github.com/mitchellh/mapstructure
+ */
+
 import (
 	"fmt"
 
@@ -7,22 +12,22 @@ import (
 )
 
 type Simple struct {
-	Key1 string `json:"key1"`
-	Key2 string `json:"key2"`
-	Key3 int    `json:"key3"`
+	Key1 string `mapstructure:"key1"`
+	Key2 string `mapstructure:"key2"`
+	Key3 int    `mapstructure:"key3"`
 }
 
 type Complex struct {
-	Name string            `json:"name"`
-	TS   uint64            `json:"ts"`
-	Val  float64           `json:"val"`
-	Tags map[string]string `json:"tags"`
+	AltName string            `mapstructure:"name"`
+	TS      uint64            `mapstructure:"ts"`
+	Val     float64           `mapstructure:"val"`
+	Tags    map[string]string `mapstructure:"tags"`
 }
 
 type VecElem struct {
-	Name string            `json:"name"`
-	Val  string            `json:"val"`
-	Tags map[string]string `json:"tags"`
+	Name string            `mapstructure:"name"`
+	Val  string            `mapstructure:"val"`
+	Tags map[string]string `mapstructure:"tags"`
 }
 
 func main() {
@@ -55,9 +60,9 @@ func (s Simple) String() string {
 }
 
 func (c Complex) String() string {
-	retStr := fmt.Sprintf("Name:  %v\n", c.Name)
-	retStr += fmt.Sprintf("TS:    %v\n", c.TS)
-	retStr += fmt.Sprintf("Val:   %v\n", c.Val)
-	retStr += fmt.Sprintf("Tags:  %v\n", c.Tags)
+	retStr := fmt.Sprintf("AltName:  %v\n", c.AltName)
+	retStr += fmt.Sprintf("TS:       %v\n", c.TS)
+	retStr += fmt.Sprintf("Val:      %v\n", c.Val)
+	retStr += fmt.Sprintf("Tags:     %v\n", c.Tags)
 	return retStr
 }
