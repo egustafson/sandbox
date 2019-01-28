@@ -1,0 +1,15 @@
+{
+    "name": "minimal-electron",
+    "version": "1.0.0",
+    "description": "A minimal electron app (learning)",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "repository": "https://github.com/egustafson/sandbox/electron/first_app",
+    "author": "egustafson@GitHub",
+    "license": "CC0-1.0",
+    "devDependencies": {
+        "electron": "^4.0.2"
+    }
+}
