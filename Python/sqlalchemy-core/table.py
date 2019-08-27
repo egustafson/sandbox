@@ -2,7 +2,7 @@
 #
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 
 metadata = MetaData()
 
@@ -45,6 +45,10 @@ conn.execute(addrs.insert(), [
 rs = conn.execute(select([users]))
 for row in rs:
     print(row)
+
+sel = select([func.max(users.c.id)])
+max = conn.execute(sel).scalar()
+print("id max value: {}".format(max))
 
 # --- Join ---
 
