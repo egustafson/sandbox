@@ -1,0 +1,8 @@
+# build artifacts
+consumer
+producer
+
+# Ignore Glide artifacts (http://glide.sh)
+vendor
+glide.yaml
+glide.lock
