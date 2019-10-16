@@ -1,0 +1,2 @@
+pykafka>=2.8.0
+appmetrics>=0.5.0
