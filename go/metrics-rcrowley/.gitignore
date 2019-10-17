@@ -1,0 +1,7 @@
+# build artifacts
+demohist
+
+# Ignore Glide artifacts (http://glide.sh)
+vendor
+glide.yaml
+glide.lock
