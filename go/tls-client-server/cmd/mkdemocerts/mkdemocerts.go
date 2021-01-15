@@ -34,11 +34,11 @@ func makeCA() (ca *x509.Certificate, caKey *rsa.PrivateKey) {
 	ca = &x509.Certificate{
 		SerialNumber: big.NewInt(1000),
 		Subject: pkix.Name{
-			Organization:  []string{"Test Company, INC."},
+			Organization:  []string{"Demo CA Issuer"},
 			Country:       []string{"US"},
 			Locality:      []string{"Denver"},
-			StreetAddress: []string{"123 Any Street"},
-			PostalCode:    []string{"80000"},
+			StreetAddress: []string{"100 Any Street"},
+			PostalCode:    []string{"80001"},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(0, 0, 2),
@@ -75,12 +75,13 @@ func makeSrvCert(ca *x509.Certificate, caKey *rsa.PrivateKey) (srvCert *x509.Cer
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2000),
 		Subject: pkix.Name{
-			Organization:  []string{"Test Company, INC."},
+			Organization:  []string{"Demo Web Company"},
 			Country:       []string{"US"},
 			Locality:      []string{"Denver"},
-			StreetAddress: []string{"123 Any Street"},
-			PostalCode:    []string{"80000"},
+			StreetAddress: []string{"200 Nowhere Street"},
+			PostalCode:    []string{"80002"},
 		},
+		DNSNames:     []string{"localhost", "localhost.local"},
 		IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(0, 0, 2),
