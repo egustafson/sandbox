@@ -1,0 +1,12 @@
+syntax = "proto3";
+package api;
+
+option go_package = "github.com/egustafson/sandbox/go/grpc-basic/api";
+
+message Message {
+    string body = 1;
+}
+
+service ChatService {
+    rpc SayHello(Message) returns (Message) {}
+}
