@@ -37,6 +37,7 @@ func (s *DemoServer) ListenHeartbeat(req *pb.HeartbeatRequest, stream pb.DemoSer
 			Note: fmt.Sprintf("beat: %d", ii),
 		}
 		if err := stream.Send(h); err != nil {
+			log.Printf("stream ending: %v", err)
 			return err
 		}
 		ii = ii + 1
