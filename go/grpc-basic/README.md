@@ -72,7 +72,3 @@ Citations & Reference
 * Stack Overflow (_Correct format of protoc go\_package_):
   https://stackoverflow.com/questions/61666805/correct-format-of-protoc-go-package
 
-
-
-<!--  LocalWords:  Makefile
- -->
