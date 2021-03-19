@@ -13,8 +13,14 @@ class DemoService(demo_pb2_grpc.DemoServiceServicer):
         pass
 
     def ListenHeartbeat(self, request, context):
-        logging.info("Received request: {}".format(request.request_id))
+        logging.info("ListenHeartbeat - received request: {}".format(request.request_id))
         return demo_pb2.Heartbeat(note="heartbeat-note")
+
+    def StreamHeartbeat(self, request, context):
+        logging.info("StreamHeartbeat - received request: {}".format(request.request_id))
+        for ii in range(3):
+            resp = demo_pb2.Heartbeat(note="stream-response-{}/{}".format(ii, request.request_id))
+            yield resp
 
 
 def serve():

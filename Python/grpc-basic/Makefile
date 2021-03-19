@@ -1,7 +1,7 @@
 # build Python gRPC example
 
 PROTOS = pb/demo/demo.proto
-PBFILES = ${PROTOS:.proto=_pb2.py}
+PBFILES = demo/demo_pb2.py
 
 
 
@@ -18,7 +18,7 @@ pbs: ${PBFILES}
 
 
 # compile gRPC ProtoBuf files (.proto) -> (_pb2.py)   (_pb2_grpc.py is a side effect)
-%_pb2.py: %.proto
+demo/demo_pb2.py: pb/demo/demo.proto
 	${PROTOC} ${PROTOC_FLAGS} $?
 
 

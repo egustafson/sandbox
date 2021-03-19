@@ -13,4 +13,5 @@ message Heartbeat {
 
 service DemoService {
   rpc ListenHeartbeat(HeartbeatRequest) returns (Heartbeat) {}
+  rpc StreamHeartbeat(HeartbeatRequest) returns (stream Heartbeat) {}
 }
