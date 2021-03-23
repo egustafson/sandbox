@@ -7,8 +7,32 @@ import grpc
 import service_pb2
 import service_pb2_grpc
 
+USE_TLS = True
+
+CA_FILE = "../test-ca.pem"
+CERT_FILE = "../test-cert.pem"
+KEY_FILE = "../test-key.pem"
+
+def read_pem(path):
+    with open(path, 'rb') as f:
+        data = f.read()
+    return data
+
 def run():
-    ch = grpc.insecure_channel('localhost:9000')
+
+    creds = grpc.ssl_channel_credentials(
+        root_certificates=read_pem(CA_FILE),
+        private_key=read_pem(KEY_FILE),
+        certificate_chain=read_pem(CERT_FILE)
+    )
+
+    if USE_TLS:
+        logging.info("using TLS")
+        ch = grpc.secure_channel('localhost:9000', creds)
+    else:
+        logging.info("TLS Disabled")
+        ch = grpc.insecure_channel('localhost:9000')
+
     stub = service_pb2_grpc.SvcStub(ch)
     req = service_pb2.SvcRequest(req_text="service-request")
     logging.info("--- DoService() --->")

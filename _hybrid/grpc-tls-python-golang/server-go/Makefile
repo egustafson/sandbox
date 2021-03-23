@@ -11,7 +11,7 @@ PROTOC_FLAGS = -I${PROTODIR} --go_out=plugins=grpc:${PBDIR} --go_opt=paths=sourc
 .PHONEY: build
 build: server
 
-server: ${PBFILES}
+server: ${PBFILES} server.go
 	go build -o server
 
 .PHONEY: pbs
