@@ -1,0 +1,11 @@
+/server
+/server-go
+
+# Ignore VSCode artifacts
+/.VSCode
+
+# Ignore protobuf compiled files (pb.go)
+*.pb.go
+
+# Ignore X.509 PEM files
+*.pem
