@@ -17,7 +17,7 @@ ${PBFILES}: ${PROTOS}
 
 .PHONEY: clean
 clean:
-	@-rm -rf `find . -name __pycache__`
+	-rm -rf `find . -name __pycache__`
 
 .PHONEY: realclean
 realclean: clean

@@ -25,18 +25,19 @@ def run():
         private_key=read_pem(KEY_FILE),
         certificate_chain=read_pem(CERT_FILE)
     )
+#     creds = grpc.ssl_channel_credentials(root_certificates=read_pem(CA_FILE))
 
     if USE_TLS:
         logging.info("using TLS")
-        ch = grpc.secure_channel('localhost:9000', creds)
+        ch = grpc.secure_channel('127.0.0.1:9000', creds)
     else:
         logging.info("TLS Disabled")
         ch = grpc.insecure_channel('localhost:9000')
 
     stub = service_pb2_grpc.SvcStub(ch)
-    req = service_pb2.SvcRequest(req_text="service-request")
+    req = service_pb2.SvcRequest(req_text="service-request-python")
     logging.info("--- DoService() --->")
-    resp = stub.DoService(req)
+    resp = stub.DoService(req, timeout=600)
     logging.info("<-- received: {}".format(resp.resp_text))
 
 

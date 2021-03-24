@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net"
+	_ "net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
-	"github.com/egustafson/sandbox/_hybrid/grpc-tls-python-golang/server-go/pb"
+	"github.com/egustafson/sandbox/_hybrid/grpc-tls-python-golang/client-go/pb"
 )
 
 const (
@@ -24,19 +25,12 @@ const (
 	keyfile  = "../test-key.pem"
 )
 
-type svc struct{}
-
-func (s *svc) DoService(ctx context.Context, req *pb.SvcRequest) (*pb.SvcResponse, error) {
-	log.Printf("Received message from client: %s", req.ReqText)
-	return &pb.SvcResponse{RespText: "response-text-golang"}, nil
-}
-
 func main() {
 	fmt.Println("start: gRPC Demo Server")
 
 	var (
-		l   net.Listener
-		err error
+		conn *grpc.ClientConn
+		err  error
 	)
 	if use_tls {
 		log.Print("using TLS")
@@ -44,27 +38,25 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to import PEM files for TLS")
 		}
-		l, err = tls.Listen("tcp", listen_addr, tlsConfig)
-		if err != nil {
-			log.Fatalf("failed to form a TLS listener: %v", err)
-		}
+		creds := credentials.NewTLS(tlsConfig)
+		conn, err = grpc.Dial("localhost:9000", grpc.WithTransportCredentials(creds))
 	} else {
 		log.Print("TLS disabled")
-		l, err = net.Listen("tcp", listen_addr)
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
-		}
-	}
 
-	service := svc{}
-	grpcServer := grpc.NewServer()
-	pb.RegisterSvcServer(grpcServer, &service)
-
-	log.Print("service configured and running.")
-	if err := grpcServer.Serve(l); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		conn, err = grpc.Dial("localhost:9000", grpc.WithInsecure())
 	}
-	// never return
+	if err != nil {
+		log.Fatalf("Dial failed: %v", err)
+	}
+	defer conn.Close()
+
+	svc := pb.NewSvcClient(conn)
+	req := &pb.SvcRequest{ReqText: "request-text-golang"}
+	resp, err := svc.DoService(context.Background(), req)
+	if err != nil {
+		log.Fatalf("gRPC request failed: %v", err)
+	}
+	log.Printf("response:  %s", resp.RespText)
 }
 
 // --  loadTlsConfig  ------------------------------------------------
@@ -93,12 +85,11 @@ func NewTlsConfig() (cfg *tls.Config, err error) {
 	}
 
 	cfg = &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ClientCAs:    caCertPool,
-		RootCAs:      caCertPool,
-		//ClientAuth:         tls.NoClientCert, // relax TLS checks (no client auth)
-		ClientAuth:         tls.RequireAnyClientCert, // relax TLS checks (no client auth)
-		InsecureSkipVerify: true,                     // relax TLS checks (no verify cert signed by CA)
+		Certificates:       []tls.Certificate{cert},
+		ClientCAs:          caCertPool,
+		RootCAs:            caCertPool,
+		ClientAuth:         tls.NoClientCert, // relax TLS checks (no client auth)
+		InsecureSkipVerify: true,             // relax TLS checks (no verify cert signed by CA)
 	}
 	return cfg, nil
 }

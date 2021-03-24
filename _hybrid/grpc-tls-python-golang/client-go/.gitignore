@@ -1,5 +1,5 @@
-/server
-/server-go
+/client
+/client-go
 
 # Ignore VSCode artifacts
 /.vscode
