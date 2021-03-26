@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from concurrent import futures
-import logging
 import grpc
+import logging
+import time
 
 import service_pb2
 import service_pb2_grpc
@@ -46,7 +47,9 @@ def serve():
 
     logging.info('service starting...')
     server.start()
-    server.wait_for_termination()
+    #server.wait_for_termination()
+    while True:
+        time.sleep(1)
 
 if __name__ == '__main__':
     logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.DEBUG)

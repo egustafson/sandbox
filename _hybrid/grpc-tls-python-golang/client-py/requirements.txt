@@ -1,3 +1,4 @@
-#grpcio-tools>=1.36.1
-grpcio-tools==1.19.0
-grpcio~=1.19.0
+#grpcio-tools~=1.16.1
+#grpcio~=1.16.1
+grpcio-tools>=1.36.1
+grpcio>=1.36.1

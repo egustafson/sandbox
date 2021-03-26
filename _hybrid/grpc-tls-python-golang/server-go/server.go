@@ -24,7 +24,9 @@ const (
 	keyfile  = "../test-key.pem"
 )
 
-type svc struct{}
+type svc struct {
+	pb.UnimplementedSvcServer // required by newer versions of protoc
+}
 
 func (s *svc) DoService(ctx context.Context, req *pb.SvcRequest) (*pb.SvcResponse, error) {
 	log.Printf("Received message from client: %s", req.ReqText)
