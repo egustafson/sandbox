@@ -43,6 +43,7 @@ func main() {
 	if use_tls {
 		log.Print("using TLS")
 		tlsConfig, err := NewTlsConfig()
+		tlsConfig.NextProtos = []string{"h2"} // <-- ** Negotiate TLS ALPN (RFC 7540)
 		if err != nil {
 			log.Fatalf("failed to import PEM files for TLS")
 		}
