@@ -15,8 +15,8 @@ func main() {
 // uid=user3,ou=People,dc=elfwerks,dc=org
 
 const (
-	group_pat  = `^cn=(?P<gr>\w+),ou=Services,ou=(?P<st>\w+),ou=Environments,dc=elfwerks,dc=org$`
-	person_pat = `^uid=(?P<uid>\w+),ou=People,dc=elfwerks,dc=org$`
+	group_pat  = `^cn=(?P<gr>[\w-]+),ou=Services,ou=(?P<st>[\w-]+),ou=Environments,dc=elfwerks,dc=org$`
+	person_pat = `^uid=(?P<uid>[\w-]+),ou=People,dc=elfwerks,dc=org$`
 )
 
 var (
