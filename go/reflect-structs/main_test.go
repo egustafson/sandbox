@@ -11,10 +11,10 @@ func TestWalk(t *testing.T) {
 		Child1: &ChildA{
 			Avalue:       "a-value",
 			AnotherValue: "another-value",
-			Child: &ChildB{
+			Children: []*ChildB{&ChildB{
 				StrValue: "str-value",
 				IntValue: 200,
-			},
+			}},
 		},
 		Child2: &ChildB{
 			StrValue: "str-value-child2",

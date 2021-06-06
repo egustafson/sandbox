@@ -16,7 +16,7 @@ type Root struct {
 
 type ChildA struct {
 	Avalue       string
-	Child        *ChildB
+	Children     []*ChildB
 	AnotherValue string
 }
 
@@ -41,6 +41,14 @@ func Walk(root interface{}) {
 				name := item.Type().Field(ii).Name
 				fmt.Printf("adding: %s\n", name)
 				val := item.Field(ii)
+				wl = append(wl, val)
+			}
+		}
+		if item.Kind() == reflect.Slice {
+			fmt.Println("slice found")
+			for ii := 0; ii < item.Len(); ii++ {
+				fmt.Printf("adding element: %d\n", ii)
+				val := item.Index(ii)
 				wl = append(wl, val)
 			}
 		}
