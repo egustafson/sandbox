@@ -15,16 +15,16 @@ func TestMain(t *testing.T) {
 	fmt.Printf("s1: % x\n", s1)
 
 	// concat a "byte" cast to a string
-	s1 = s1 + string(0) + string(0x7f)
-	fmt.Printf("s1: % x\n", s1)
+	s2 := s1 + string([]byte{0}) + string([]byte{0x7f})
+	fmt.Printf("s2: % x\n", s2)
 
 	// concat a "byte" > 0x7f => encoding rules
-	s1 = s1 + string(0) + string(0x80) // 2 bytes concatinated
-	fmt.Printf("s1: % x\n", s1)
+	s3 := s1 + string([]byte{0}) + string([]byte{0x80}) // 2 bytes concatinated
+	fmt.Printf("s3: % x\n", s3)
 
 	// larger (>0xff) numbers are also "encoded" as UTF ruins
-	s1 = s1 + string(0) + string(0xf7fff) + string(0)
-	fmt.Printf("s1: % x\n", s1)
+	s4 := s1 + string([]byte{0}) + string([]byte{0x0f, 0x7f, 0xff}) + string([]byte{0})
+	fmt.Printf("s4: % x\n", s4)
 
 	// Creating a buffer from string works as expected
 	b1 := bytes.NewBufferString("ABCD")
