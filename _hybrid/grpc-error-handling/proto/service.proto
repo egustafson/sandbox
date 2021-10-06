@@ -1,0 +1,16 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "github.com/egustafson/sandbox/_hybrid/grpc-error-handling/server-go/pb";
+
+message SvcRequest {
+  string req_text = 1;
+}
+
+message SvcResponse {
+  string resp_text = 1;
+}
+
+service Svc {
+  rpc DoService(SvcRequest) returns (SvcResponse) {}
+}
