@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
@@ -16,7 +17,8 @@ import (
 )
 
 const (
-	listen_addr = ":9000"
+	listen_addr   = ":9000"
+	timeout_sleep = time.Hour
 )
 
 type svc struct {
@@ -40,6 +42,8 @@ func (s *svc) DoService(ctx context.Context, req *pb.SvcRequest) (*pb.SvcRespons
 		respErr = status.Error(codes.Internal, "err-internal-resp-msg")
 	case "err-abort-req-msg":
 		respErr = mkErrorInfoErr()
+	case "err-timeout":
+		time.Sleep(timeout_sleep)
 	default:
 		respText = "unk-resp-msg"
 	}
@@ -52,7 +56,7 @@ func (s *svc) DoService(ctx context.Context, req *pb.SvcRequest) (*pb.SvcRespons
 }
 
 func mkErrorInfoErr() error {
-	st := status.New(codes.Aborted, "aborted operation placeholder")
+	st := status.New(codes.Aborted, "err-abort-resp-msg")
 	errorInfo := &errdetails.ErrorInfo{
 		Reason: "reason-string-abort-requested",
 		Domain: "kvs.viasat",

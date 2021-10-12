@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	_ "net"
+	"time"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
@@ -15,7 +16,8 @@ import (
 )
 
 const (
-	listen_addr = ":9000"
+	listen_addr      = ":9000"
+	timeout_duration = time.Second * 10 // 10 seconds
 )
 
 func main() {
@@ -41,11 +43,15 @@ func main() {
 	doRequest(svc, "err-req-msg")
 	doRequest(svc, "err-internal-req-msg")
 	doRequest(svc, "err-abort-req-msg") // emits an ErrorInfo
+	doRequest(svc, "err-timeout")       // cause service to delay 1 hr
 }
 
 func doRequest(svc pb.SvcClient, msg string) {
+	deadline := time.Now().Add(timeout_duration) // <-- timeout
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
 	req := &pb.SvcRequest{ReqText: msg}
-	resp, err := svc.DoService(context.Background(), req)
+	resp, err := svc.DoService(ctx, req)
 	if err != nil {
 		_, ok := status.FromError(err) // <-- demonstrate the way to detect a conversion error (should NEVER happen).
 		if !ok {
