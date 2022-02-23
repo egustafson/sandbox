@@ -1,0 +1,16 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "github.com/egustafson/sandbox/go/grpc-streaming/pb";
+
+message HeartbeatRequest {
+  string request_id = 1;
+}
+
+message Heartbeat {
+  uint64 index = 1;
+}
+
+service DemoService {
+  rpc ListenHeartbeat(HeartbeatRequest) returns (stream Heartbeat) {}
+}
