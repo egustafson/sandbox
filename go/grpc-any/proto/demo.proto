@@ -1,0 +1,14 @@
+syntax = "proto3";
+package anydemo;
+
+option go_package = "github.com/egustafson/sandbox/go/grpc-any/pb";
+
+import "google/protobuf/any.proto";
+
+message AnyMessage {
+  google.protobuf.Any anything = 1;
+}
+
+message StrMessage {
+  string msg = 1;
+}
