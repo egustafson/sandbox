@@ -1,5 +1,26 @@
 package main
 
+// Conditions: the example(s) below can be run with a FUNCTIONING etcd
+// node on any or all of the listed endpoints.  "Functioning" means
+// the node is "in quorem"; this could be a single node configured as
+// such, or 2 nodes of a 3 node cluster being up.  etcd will not
+// respond if it doesn't have quorem.
+//
+// Expected behavior:
+//
+// newExample - regardless if etcd is running or not, the example
+// should initialize, NOT panic(), and loop printing HEALTHY or
+// UN-HEALTHY based on if etcd is up or not.  etcd can be brought up
+// and dropped while the loop is running and the loop should continue,
+// printing an appropriate health state.
+//
+// newExample exemplifies that an etcd client "handle" can be
+// constructed and not return an error, even if the etcd cluster is
+// not up.
+//
+// oldExample - prints diagnostic information if etcd is up, or errors
+// out if etcd is down.
+
 import (
 	"context"
 	"fmt"
@@ -22,6 +43,35 @@ var (
 )
 
 func main() {
+	newExample()
+}
+
+func newExample() {
+	endpoints := []string{
+		ENDPOINT_1,
+		ENDPOINT_2,
+		ENDPOINT_3,
+	}
+	fmt.Printf("attempting to connect to etcd: { %v }\n", endpoints)
+
+	// should never error, even if etcd not present.
+	st, err := NewEtcdStore(endpoints)
+	if err != nil {
+		panic(err)
+	}
+
+	for ii := 0; ii < 60; ii++ {
+		healthy := st.Healthy()
+		if healthy {
+			fmt.Println("etcd connection is HEALTHY")
+		} else {
+			fmt.Println("etcd connection is UN-HEALTHY")
+		}
+		time.Sleep(time.Second)
+	}
+}
+
+func origExample() {
 
 	client, err := clientv3.New(clientv3.Config{
 		DialTimeout: dialTimeout,
