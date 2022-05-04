@@ -10,12 +10,27 @@ func crunch(vec []string) []string {
 	return vec[1:]
 }
 
-func main() {
-	vec := []string{"a1", "a2", "a3", "a4"}
+func addto(vec []string) []string {
+	// vec is passed by value.  Appending to it does not modify the
+	// variable passed in.
+	vec = append(vec, "a5")
+	return vec
+}
 
-	fmt.Printf("vec: %v\n", vec)
-	vec = crunch(vec)
-	fmt.Printf("vec: %v\n", vec)
+func main() {
+	ovec := []string{"a1", "a2", "a3", "a4"}
+
+	fmt.Printf("orig vec: %v\n", ovec)
+
+	fmt.Println("crunch(ovec)")
+	nvec := crunch(ovec)
+	fmt.Printf("orig vec: %v\n", ovec)
+	fmt.Printf("new  vec: %v\n", nvec)
+
+	fmt.Println("addto(ovec)")
+	nvec = addto(ovec)
+	fmt.Printf("orig vec: %v\n", ovec)
+	fmt.Printf("new  vec: %v\n", nvec)
 
 	fmt.Println("done.")
 }
