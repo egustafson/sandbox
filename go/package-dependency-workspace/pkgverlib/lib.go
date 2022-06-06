@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	SelfPackageName = "github.com/egustafson/sandbox/go/pkgverlib"
+	SelfPackageName = "github.com/egustafson/sandbox/go/package-dependency-workspace/pkgverlib"
 )
 
 // VersionID returns a string that identifies the package version.

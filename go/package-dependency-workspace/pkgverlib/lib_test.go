@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/egustafson/sandbox/go/package-dependency-worksace/pkgverlib"
+	"github.com/egustafson/sandbox/go/package-dependency-workspace/pkgverlib"
 )
 
 func TestVersionID(t *testing.T) {
