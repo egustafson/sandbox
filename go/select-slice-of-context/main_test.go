@@ -59,7 +59,6 @@ func TestMain(t *testing.T) {
 		assert.Fail(t, "w[0].ch should have been closed by b.Fail(0)")
 	}
 
-	runtime.Gosched()              // yield so the canceled context can react
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
 
 	assert.Equal(t, m.NumWatchers(), 4)
@@ -69,8 +68,6 @@ func TestMain(t *testing.T) {
 	b.Message("test-message")
 	ReadAllWatchers(t, w)
 	AllWatchersBlockOnRead(t, w)
-
-	runtime.Gosched() // yield so the canceled context can react
 
 	assert.Equal(t, m.NumWatchers(), 4)
 
@@ -90,8 +87,6 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	runtime.Gosched() // yield so the canceled context can react
-
 	assert.Equal(t, m.NumWatchers(), 3)
 
 	// Frontend closes with messages in the channels
@@ -110,8 +105,6 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	runtime.Gosched() // yield so the canceled context can react
-
 	assert.Equal(t, m.NumWatchers(), 2)
 
 	// Frontend closes with the channels empty
@@ -128,7 +121,6 @@ func TestMain(t *testing.T) {
 	}
 	ReadAllWatchers(t, w) // all (remaining) watchers should return a message
 
-	runtime.Gosched()              // yield so the canceled context can react
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
 
 	assert.Equal(t, m.NumWatchers(), 1)
