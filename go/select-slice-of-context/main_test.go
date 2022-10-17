@@ -33,7 +33,7 @@ func TestMain(t *testing.T) {
 	m, b := NewMiddleware()
 
 	w := make(map[int]AppWatcher) // watchers
-	for ii := 0; ii < 5; ii++ {
+	for ii := 0; ii < 6; ii++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wch := m.Watch(ctx, ii)
 		w[ii] = AppWatcher{
@@ -44,7 +44,7 @@ func TestMain(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, m.NumWatchers(), 5)
+	assert.Equal(t, m.NumWatchers(), 6)
 
 	// Backend closes with nothing to be read in the queues
 	//
@@ -61,7 +61,7 @@ func TestMain(t *testing.T) {
 
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
 
-	assert.Equal(t, m.NumWatchers(), 4)
+	assert.Equal(t, m.NumWatchers(), 5)
 
 	//  Verify all (existing) watchers receive messages
 	//
@@ -69,7 +69,7 @@ func TestMain(t *testing.T) {
 	ReadAllWatchers(t, w)
 	AllWatchersBlockOnRead(t, w)
 
-	assert.Equal(t, m.NumWatchers(), 4)
+	assert.Equal(t, m.NumWatchers(), 5)
 
 	// Backend closes with messages in the channels
 	//
@@ -87,7 +87,7 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	assert.Equal(t, m.NumWatchers(), 3)
+	assert.Equal(t, m.NumWatchers(), 4)
 
 	// Frontend closes with messages in the channels
 	//
@@ -105,7 +105,7 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	assert.Equal(t, m.NumWatchers(), 2)
+	assert.Equal(t, m.NumWatchers(), 3)
 
 	// Frontend closes with the channels empty
 	w[3].cancel() // from the frontend: cancel/close before write
@@ -123,7 +123,33 @@ func TestMain(t *testing.T) {
 
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
 
-	assert.Equal(t, m.NumWatchers(), 1)
+	assert.Equal(t, m.NumWatchers(), 2)
+
+	// Middleware closes with message in the channels
+
+	b.Message("test-message")
+	m.Close()             // all watchers should now shutdown, just like canceling the context of each.
+	ReadAllWatchers(t, w) // all watchers should return the test-message they received
+	// remaining watchers [4, 5] should now return closed
+	select {
+	case _, ok := <-w[4].ch:
+		assert.False(t, ok) // indicating the channel was closed
+		delete(w, 4)        // remove the watcher, it's extinguished
+	case <-time.After(time.Millisecond):
+		assert.Fail(t, "w[4].ch should have been closed by m.Close()")
+	}
+	select {
+	case _, ok := <-w[5].ch:
+		assert.False(t, ok) // indicating the channel was closed
+		delete(w, 5)        // remove the watcher, its been extinguished
+	case <-time.After(time.Millisecond):
+		assert.Fail(t, "w[5].ch should have been closed by m.Close()")
+	}
+	AllWatchersBlockOnRead(t, w) // all watchers should be closed and reaped, .. actually
+
+	<-time.After(time.Millisecond)
+
+	assert.Equal(t, m.NumWatchers(), 0) // all watchers should be closed and reaped
 }
 
 func ReadAllWatchers(t *testing.T, watchers map[int]AppWatcher) {
