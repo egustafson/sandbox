@@ -44,8 +44,6 @@ func TestMain(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, m.NumWatchers(), 6)
-
 	// Backend closes with nothing to be read in the queues
 	//
 	b.Fail(0)         // immediately fail watcher 0 from the backend
@@ -61,15 +59,11 @@ func TestMain(t *testing.T) {
 
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
 
-	assert.Equal(t, m.NumWatchers(), 5)
-
 	//  Verify all (existing) watchers receive messages
 	//
 	b.Message("test-message")
 	ReadAllWatchers(t, w)
 	AllWatchersBlockOnRead(t, w)
-
-	assert.Equal(t, m.NumWatchers(), 5)
 
 	// Backend closes with messages in the channels
 	//
@@ -87,8 +81,6 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	assert.Equal(t, m.NumWatchers(), 4)
-
 	// Frontend closes with messages in the channels
 	//
 	b.Message("test-message")
@@ -105,8 +97,6 @@ func TestMain(t *testing.T) {
 	}
 	AllWatchersBlockOnRead(t, w)
 
-	assert.Equal(t, m.NumWatchers(), 3)
-
 	// Frontend closes with the channels empty
 	w[3].cancel() // from the frontend: cancel/close before write
 	// no goroutine yield, cancelation is strictly ordered before write
@@ -122,8 +112,6 @@ func TestMain(t *testing.T) {
 	ReadAllWatchers(t, w) // all (remaining) watchers should return a message
 
 	<-time.After(time.Millisecond) // yield hard to give other goroutines a chance to run
-
-	assert.Equal(t, m.NumWatchers(), 2)
 
 	// Middleware closes with message in the channels
 
@@ -148,8 +136,6 @@ func TestMain(t *testing.T) {
 	AllWatchersBlockOnRead(t, w) // all watchers should be closed and reaped, .. actually
 
 	<-time.After(time.Millisecond)
-
-	assert.Equal(t, m.NumWatchers(), 0) // all watchers should be closed and reaped
 }
 
 func ReadAllWatchers(t *testing.T, watchers map[int]AppWatcher) {

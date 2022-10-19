@@ -48,3 +48,15 @@ approaches are detailed in [stack-overflow-1][1].
 
 <!-- References -->
 [1]: <https://stackoverflow.com/questions/19992334/how-to-listen-to-n-channels-dynamic-select-statement> "how to listen to N channels? (dynamic select statement)"
+
+Update and Simplification
+-------------------------
+
+After attempting to apply the pattern developed in this example to the
+real world problem I identified some simplifications that removed a
+reasonable amount of the code in Middleware.  The original solution is
+visible from the tag `go-select-slice-v1`:
+
+* https://github.com/egustafson/sandbox/tree/go-select-slice-v1/go/select-slice-of-context
+
+The simplification is the latest commit.
