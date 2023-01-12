@@ -7,3 +7,5 @@ target
 .settings
 
 .buildpath
+
+.vscode/

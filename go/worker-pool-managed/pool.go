@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"sync"
 	"sync/atomic"
 
 	"github.com/Masterminds/log-go"
@@ -10,21 +11,23 @@ import (
 
 type Pool interface {
 	DoWork(ctx context.Context, wd *WorkDescription) (r *WorkResult, err error)
-	//Acquire(ctx context.Context) (w Worker, err error)
-	//Return(w Worker)
+	AcquireWorker(ctx context.Context) (w Worker, err error)
+	ReturnWorker(w Worker)
 	Close()
 }
 
 type lazyInitWorkerPool struct {
-	ID            string
-	workerFactory WorkerFactory
-	pool          chan Worker
-	ctx           context.Context
-	cancel        context.CancelFunc
-	poolMax       int
-	poolMin       int
-	numWorkers    *atomic.Int32
-	idleWorkers   *atomic.Int32
+	ID             string
+	workerFactory  WorkerFactory
+	allWorkers     map[string]Worker
+	allWorkersLock sync.Mutex
+	pool           chan Worker
+	ctx            context.Context
+	cancel         context.CancelFunc
+	poolMax        int
+	poolMin        int
+	numWorkers     *atomic.Int32
+	idleWorkers    *atomic.Int32
 }
 
 // static check: simplePool implements Pool
@@ -34,6 +37,7 @@ func NewLazyInitWorkerPool(factory WorkerFactory, id string, max, min int) Pool 
 	p := &lazyInitWorkerPool{
 		ID:            id,
 		workerFactory: factory,
+		allWorkers:    make(map[string]Worker),
 		pool:          make(chan Worker, max+1),
 		poolMax:       max,
 		poolMin:       min,
@@ -61,7 +65,7 @@ func (p *lazyInitWorkerPool) DoWork(ctx context.Context, wd *WorkDescription) (r
 		return nil, p.ctx.Err()
 	}
 
-	w, err := p.acquireWorker(ctx)
+	w, err := p.AcquireWorker(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +75,7 @@ func (p *lazyInitWorkerPool) DoWork(ctx context.Context, wd *WorkDescription) (r
 		ResponseCh: make(chan *WorkResponse, 1),
 	}
 	go func() {
-		defer p.returnWorker(w)
+		defer p.ReturnWorker(w)
 		w.DoRequest(req)
 	}()
 
@@ -95,7 +99,7 @@ func (p *lazyInitWorkerPool) congested() bool {
 	return false // <-- the 'dumb' heuristic.
 }
 
-func (p *lazyInitWorkerPool) acquireWorker(ctx context.Context) (w Worker, err error) {
+func (p *lazyInitWorkerPool) AcquireWorker(ctx context.Context) (w Worker, err error) {
 	// Logic:  (not in implementation order)
 	// if worker available in queue then pull it and use it.
 	// if numWorkers < highWaterWorkers then allocate another and use it.
@@ -127,7 +131,7 @@ func (p *lazyInitWorkerPool) acquireWorker(ctx context.Context) (w Worker, err e
 	}
 }
 
-func (p *lazyInitWorkerPool) returnWorker(w Worker) {
+func (p *lazyInitWorkerPool) ReturnWorker(w Worker) {
 
 	// if idleWorkers < lowWaterWorkers then return worker to pool
 	// if "congested" then return worker to pool
@@ -169,8 +173,12 @@ func (p *lazyInitWorkerPool) addNewWorker() {
 	}
 	if p.numWorkers.CompareAndSwap(numWorkers, numWorkers+1) {
 		// success!  add the worker to the pool, the count has been increased
+		log.Infof("worker added to pool: %s", w.ID())
 		p.idleWorkers.Add(1)
 		p.pool <- w
+		p.allWorkersLock.Lock()
+		defer p.allWorkersLock.Unlock()
+		p.allWorkers[w.ID()] = w
 	} else {
 		// unsuccessful add, throw away worker, someone else will try later
 		w.Close()
@@ -178,6 +186,10 @@ func (p *lazyInitWorkerPool) addNewWorker() {
 }
 
 func (p *lazyInitWorkerPool) decommissionWorker(w Worker) {
+	log.Infof("worker removed from pool: %s", w.ID())
 	p.numWorkers.Add(-1)
 	w.Close()
+	p.allWorkersLock.Lock()
+	defer p.allWorkersLock.Unlock()
+	delete(p.allWorkers, w.ID())
 }

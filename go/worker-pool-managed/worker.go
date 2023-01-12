@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"sync/atomic"
+	"time"
 
 	"github.com/Masterminds/log-go"
 )
 
 type WorkDescription struct {
-	Scope int
+	Effort int
 }
 
 type WorkResult struct {
@@ -29,6 +30,7 @@ type WorkResponse struct {
 }
 
 type Worker interface {
+	ID() string
 	DoRequest(req *WorkRequest) // result passed through req.ResultCh
 	IsHealthy() bool
 	Close()
@@ -46,7 +48,7 @@ func init() {
 }
 
 type simpleWorker struct {
-	ID string
+	id string
 }
 
 // static check:  simpleWorker implements Worker
@@ -55,29 +57,35 @@ var _ Worker = new(simpleWorker)
 func SimpleWorkerFactory() (Worker, error) {
 	id := simpleWorkerIDCounter.Add(1)
 	w := &simpleWorker{
-		ID: fmt.Sprintf("simple-worker-%d", id),
+		id: fmt.Sprintf("simple-worker-%d", id),
 	}
-	log.Debugf("worker created: %s", w.ID)
+	log.Debugf("worker created: %s", w.ID())
 	return w, nil
 }
 
 func (w *simpleWorker) DoRequest(req *WorkRequest) {
-	//
-	// Simple worker:  just return a positive result immediately
-	//
+
+	// delay for a short time
+	<-time.After(time.Duration(req.Work.Effort) * time.Millisecond)
+
 	req.ResponseCh <- &WorkResponse{
 		Result: &WorkResult{true},
 		Err:    nil,
 	}
 }
 
+func (w *simpleWorker) ID() string      { return w.id }
 func (w *simpleWorker) IsHealthy() bool { return true }
-func (w *simpleWorker) Close()          {}
+func (w *simpleWorker) Close() {
+	log.Debugf("worker closed: %s", w.ID())
+}
 
 // --  Mock Unstable Worker  -----------------------------------------
 //
 
-type mockUnstableWorker struct{}
+type mockUnstableWorker struct {
+	id string
+}
 
 // static check:  mockUnstableWorker implements Worker
 var _ Worker = new(mockUnstableWorker)
@@ -94,5 +102,6 @@ func (w *mockUnstableWorker) DoRequest(req *WorkRequest) {
 	}
 }
 
+func (w *mockUnstableWorker) ID() string      { return w.id }
 func (w *mockUnstableWorker) IsHealthy() bool { return true }
 func (w *mockUnstableWorker) Close()          {}
