@@ -31,3 +31,12 @@ func bodyTransformError(er error) BodyTransformError {
 	e := fmt.Errorf("body transformation failed: %w", er)
 	return BodyTransformError(e)
 }
+
+type MultiLineCommandLineError interface {
+	error
+}
+
+func multiLineCommandLineError(n int) MultiLineCommandLineError {
+	e := fmt.Errorf("command line is more than one line: %d", n)
+	return MultiLineCommandLineError(e)
+}

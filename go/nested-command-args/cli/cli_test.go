@@ -18,8 +18,8 @@ type testYamlResponse struct {
 }
 
 var (
-	testHandlers = cli.NewCliHandler()
-	ctx          = context.Background()
+	testHandlers = cli.NewCliHandler()  // used by ALL cli_xxx_test.go tests
+	testCtx      = context.Background() // used by ALL cli_xxx_test.go tests
 )
 
 func init() {
@@ -69,7 +69,7 @@ func HeaderZeroBodyResponseTestHandler(ctx context.Context, resp *cli.Response, 
 	resp.Headers.Set("test-header", "test-value")
 }
 
-// --  Test Cases  ----------------------------------------
+// --  Test Cases  ----------------------------------------------------------
 
 func TestEmptyCmdLine(t *testing.T) {
 	emptyCmdLineError := cli.EmptyCommandLineError(nil)
@@ -97,7 +97,7 @@ func TestEmptyCmdLine(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := testHandlers.Execute(ctx, tt.cmdline)
+			_, err := testHandlers.Execute(testCtx, tt.cmdline)
 			assert.True(t, errors.As(err, &emptyCmdLineError))
 		})
 	}
@@ -105,12 +105,12 @@ func TestEmptyCmdLine(t *testing.T) {
 
 func TestUnknownHandler(t *testing.T) {
 	unknownCommandError := cli.UnknownCommandError(nil)
-	_, err := testHandlers.Execute(ctx, "unknown-command")
+	_, err := testHandlers.Execute(testCtx, "unknown-command")
 	assert.True(t, errors.As(err, &unknownCommandError))
 }
 
 func TestExecuteStringResponseCmd(t *testing.T) {
-	r, err := testHandlers.Execute(ctx, "testing")
+	r, err := testHandlers.Execute(testCtx, "testing")
 	assert.Nil(t, err)
 	if assert.NotNil(t, r) {
 		assert.Greater(t, len(r.Body()), 0)
@@ -122,7 +122,7 @@ func TestExecuteStringResponseCmd(t *testing.T) {
 }
 
 func TestExecuteYamlResponseCmd(t *testing.T) {
-	r, err := testHandlers.Execute(ctx, "tyaml")
+	r, err := testHandlers.Execute(testCtx, "tyaml")
 	assert.Nil(t, err)
 	if assert.NotNil(t, r) {
 		assert.Greater(t, len(r.Body()), 0)
@@ -141,7 +141,7 @@ func TestExecuteYamlResponseCmd(t *testing.T) {
 }
 
 func TestExecuteArgsResponseCmd(t *testing.T) {
-	r, err := testHandlers.Execute(ctx, "args a b c d")
+	r, err := testHandlers.Execute(testCtx, "args a b c d")
 	assert.Nil(t, err)
 	if assert.NotNil(t, r) {
 		assert.Greater(t, len(r.Body()), 0)
@@ -157,12 +157,12 @@ func TestExecuteArgsResponseCmd(t *testing.T) {
 		}
 	}
 
-	_, err = testHandlers.Execute(ctx, "args") // no args == error
+	_, err = testHandlers.Execute(testCtx, "args") // no args == error
 	assert.NotNil(t, err)
 }
 
 func TestExecuteHeaderZeroBodyCmd(t *testing.T) {
-	r, err := testHandlers.Execute(ctx, "zero-body")
+	r, err := testHandlers.Execute(testCtx, "zero-body")
 	assert.Nil(t, err)
 	if assert.NotNil(t, r) {
 		assert.Equal(t, len(r.Body()), 0)
