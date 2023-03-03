@@ -67,9 +67,9 @@ func (h *Headers) GetAll(k string) []string {
 // Set sets the first header with key = 'k' to 'v' or appends a new Header to
 // the list.
 func (h *Headers) Set(k, v string) {
-	for _, hdr := range *h {
+	for idx, hdr := range *h {
 		if hdr.Key == k {
-			hdr.Value = v // overwrite
+			(*h)[idx].Value = v // overwrite
 			return
 		}
 	}

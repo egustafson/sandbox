@@ -9,7 +9,7 @@ import (
 
 type CliHandler interface {
 	Register(handler Handler)
-	Execute(ctx context.Context, cmdline string) (Response, error)
+	Execute(ctx context.Context, cmdline string) (Message, error)
 }
 
 type Handler struct {
@@ -26,7 +26,7 @@ type Handler struct {
 
 	// HandlerFn is the function to invoke to handle the command.  When
 	// HandlerFn is invoked the command string will be striped from 'args'
-	HandlerFn func(ctx context.Context, args []string) *Result
+	HandlerFn func(ctx context.Context, resp *Response, req *Request)
 }
 
 type handlerMap struct {
@@ -52,7 +52,7 @@ func (h *handlerMap) Register(handler Handler) {
 	h.Map[handler.Command] = handler
 }
 
-func (h *handlerMap) Execute(ctx context.Context, cmdline string) (Response, error) {
+func (h *handlerMap) Execute(ctx context.Context, cmdline string) (Message, error) {
 
 	// parse the command line
 	//
@@ -60,10 +60,7 @@ func (h *handlerMap) Execute(ctx context.Context, cmdline string) (Response, err
 		return nil, emptyCommandLineError()
 	}
 	cl := strings.ReplaceAll(cmdline, "\\\n", " ") // replace escaped newline with space
-	lines := strings.Split(cl, "\n")
-	if len(lines) < 1 {
-		return nil, emptyCommandLineError() // it's all blank lines
-	}
+	lines := strings.Split(cl, "\n")               // only parse to the first "real" newline
 	args := strings.Fields(lines[0])
 	if len(args) < 1 {
 		return nil, emptyCommandLineError() // it's all whitespace
@@ -71,27 +68,32 @@ func (h *handlerMap) Execute(ctx context.Context, cmdline string) (Response, err
 
 	// locate the handler
 	//
-	hdlr, ok := h.Map[args[0]]
+	handler, ok := h.Map[args[0]]
 	if !ok {
 		return nil, unknownCommandError(args[0])
 	}
 
 	// process the handler's result --> response + error
-	r := hdlr.HandlerFn(ctx, args[1:])
-	resp := &response{headers: r.Headers}
-	if r.Body != nil {
+	req := &Request{
+		Command: args[0],
+		Args:    args[1:],
+	}
+	resp := &Response{}
+	handler.HandlerFn(ctx, resp, req)
+	message := &message{headers: resp.Headers}
+	if resp.Body != nil {
 		var contentType string
 		var err error
-		resp.body, contentType, err = transformResultBody(r.Body)
+		message.body, contentType, err = transformResultBody(resp.Body)
 		if err != nil {
-			resp.headers.Set(contentTypeKey, contentType) // override because of error
-			return resp, err                              // return yaml parse error
+			message.headers.Set(contentTypeKey, contentType) // override because of error
+			return message, err                              // return yaml parse error
 		}
-		if len(contentType) > 0 && !r.Headers.Contains(contentTypeKey) {
-			resp.headers.Set(contentTypeKey, contentType)
+		if len(contentType) > 0 && !resp.Headers.Contains(contentTypeKey) {
+			message.headers.Set(contentTypeKey, contentType)
 		}
 	}
-	return resp, r.Err
+	return message, resp.Err
 }
 
 func transformResultBody(b any) (body string, contentType string, err error) {

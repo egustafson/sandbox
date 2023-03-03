@@ -45,39 +45,69 @@ func init() {
 	})
 }
 
-func StringResponseTestHandler(ctx context.Context, args []string) *cli.Result {
-	return &cli.Result{
-		Body: "testing-result",
+func StringResponseTestHandler(ctx context.Context, resp *cli.Response, req *cli.Request) {
+	resp.Body = "testing-result"
+}
+
+func YamlResponseTestHandler(ctx context.Context, resp *cli.Response, req *cli.Request) {
+	resp.Body = testYamlResponse{
+		ID:  "id-1",
+		Val: 123,
+		Msg: "testing-yaml-handler-message",
 	}
 }
 
-func YamlResponseTestHandler(ctx context.Context, args []string) *cli.Result {
-	return &cli.Result{
-		Body: testYamlResponse{
-			ID:  "id-1",
-			Val: 123,
-			Msg: "testing-yaml-handler-message",
-		},
+func ArgsResponseTestHandler(ctx context.Context, resp *cli.Response, req *cli.Request) {
+	resp.Body = req.Args
+	if len(req.Args) < 1 {
+		resp.Err = errors.New("no arguments present")
 	}
 }
 
-func ArgsResponseTestHandler(ctx context.Context, args []string) *cli.Result {
-	if len(args) < 1 {
-		return &cli.Result{
-			Body: args,
-			Err:  errors.New("no arguments present"),
-		}
-	}
-	return &cli.Result{Body: args}
-}
-
-func HeaderZeroBodyResponseTestHandler(ctx context.Context, args []string) *cli.Result {
-	r := &cli.Result{Body: ""}
-	r.Headers.Set("test-header", "test-value")
-	return r
+func HeaderZeroBodyResponseTestHandler(ctx context.Context, resp *cli.Response, req *cli.Request) {
+	resp.Body = ""
+	resp.Headers.Set("test-header", "test-value")
 }
 
 // --  Test Cases  ----------------------------------------
+
+func TestEmptyCmdLine(t *testing.T) {
+	emptyCmdLineError := cli.EmptyCommandLineError(nil)
+
+	tests := []struct {
+		name    string
+		cmdline string
+	}{
+		{
+			name:    "blank line",
+			cmdline: "",
+		}, {
+			name:    "new-line",
+			cmdline: "\n",
+		}, {
+			name:    "new-lines",
+			cmdline: "\n\n\n\n",
+		}, {
+			name:    "all blank lines",
+			cmdline: " \n \n \n ",
+		}, {
+			name:    "blank line with tab",
+			cmdline: "\t\n \n\t \n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := testHandlers.Execute(ctx, tt.cmdline)
+			assert.True(t, errors.As(err, &emptyCmdLineError))
+		})
+	}
+}
+
+func TestUnknownHandler(t *testing.T) {
+	unknownCommandError := cli.UnknownCommandError(nil)
+	_, err := testHandlers.Execute(ctx, "unknown-command")
+	assert.True(t, errors.As(err, &unknownCommandError))
+}
 
 func TestExecuteStringResponseCmd(t *testing.T) {
 	r, err := testHandlers.Execute(ctx, "testing")
