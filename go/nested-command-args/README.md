@@ -29,4 +29,4 @@ Cobra was considered as a solution.
 
 ## Usage and Examples
 
-- TBD
+see: example_test.go
