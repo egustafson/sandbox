@@ -12,6 +12,7 @@ type KeyValue struct {
 
 type KV interface {
 	Close()
+	Dump() string
 	Put(k Key, v Value) error
 	Get(k Key) (v Value, err error)
 	GetPrefix(k Key) (kvs []KeyValue, err error)
@@ -24,4 +25,11 @@ type NoSuchKeyError interface{ error }
 func noSuchKeyError() NoSuchKeyError {
 	e := errors.New("no such key")
 	return NoSuchKeyError(e)
+}
+
+type ClosedError interface{ error }
+
+func closedError() ClosedError {
+	e := errors.New("kv store closed")
+	return ClosedError(e)
 }

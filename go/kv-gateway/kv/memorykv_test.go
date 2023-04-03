@@ -16,35 +16,57 @@ func TestKVTestSuite(t *testing.T) {
 
 type KVTestSuite struct {
 	suite.Suite
-	kvs kv.KV
+	kvdb kv.KV
 }
 
 func (s *KVTestSuite) SetupTest() {
-	s.kvs = kv.NewMemoryKV()
+	s.kvdb = kv.NewMemoryKV()
 }
 
 func (s *KVTestSuite) TearDownTest() {
-	s.kvs.Close()
-	s.kvs = nil
+	s.kvdb.Close()
+	s.kvdb = nil
 }
 
 func (s *KVTestSuite) TestPutGetDelGet() {
 	k := kv.Key([]byte("key"))
 	v := kv.Value([]byte("value"))
 
-	err := s.kvs.Put(k, v)
+	err := s.kvdb.Put(k, v)
 	s.Nil(err)
 
-	val, err := s.kvs.Get(k)
+	val, err := s.kvdb.Get(k)
 	s.Nil(err)
 	s.Equal(v, val)
 
-	err = s.kvs.Del(k)
+	err = s.kvdb.Del(k)
 	s.Nil(err)
 
-	_, err = s.kvs.Get(k)
+	_, err = s.kvdb.Get(k)
 	nskErr := kv.NoSuchKeyError(nil)
 	s.ErrorAs(err, &nskErr)
+}
+
+func (s *KVTestSuite) TestClose() {
+	s.kvdb.Close()
+	closedError := kv.ClosedError(nil)
+
+	s.kvdb.Dump() // indirectly verify it doesn't panic()
+
+	err := s.kvdb.Put(kv.Key(""), kv.Value(""))
+	s.ErrorAs(err, &closedError)
+
+	_, err = s.kvdb.Get(kv.Key(""))
+	s.ErrorAs(err, &closedError)
+
+	_, err = s.kvdb.GetPrefix(kv.Key(""))
+	s.ErrorAs(err, &closedError)
+
+	err = s.kvdb.Del(kv.Key(""))
+	s.ErrorAs(err, &closedError)
+
+	_, err = s.kvdb.DelPrefix(kv.Key(""))
+	s.ErrorAs(err, &closedError)
 }
 
 func createKVList(prefix string, count int) (kvs []kv.KeyValue) {
@@ -64,11 +86,11 @@ func loadKV(kvs kv.KV, kvlist []kv.KeyValue) {
 
 func (s *KVTestSuite) TestGetPrefix() {
 	p := "key-b"
-	loadKV(s.kvs, createKVList(p, 10))
-	loadKV(s.kvs, createKVList("key-a", 10))
-	loadKV(s.kvs, createKVList("key-c", 10))
+	loadKV(s.kvdb, createKVList(p, 10))
+	loadKV(s.kvdb, createKVList("key-a", 10))
+	loadKV(s.kvdb, createKVList("key-c", 10))
 
-	bKeys, err := s.kvs.GetPrefix(kv.Key([]byte(p)))
+	bKeys, err := s.kvdb.GetPrefix(kv.Key([]byte(p)))
 	s.Nil(err)
 	s.True(len(bKeys) == 10)
 	for _, kv := range bKeys {
@@ -79,20 +101,34 @@ func (s *KVTestSuite) TestGetPrefix() {
 
 func (s *KVTestSuite) TestDelPrefix() {
 	p := "key-b"
-	loadKV(s.kvs, createKVList(p, 10))
-	loadKV(s.kvs, createKVList("key-a", 10))
-	loadKV(s.kvs, createKVList("key-c", 10))
+	loadKV(s.kvdb, createKVList(p, 10))
+	loadKV(s.kvdb, createKVList("key-a", 10))
+	loadKV(s.kvdb, createKVList("key-c", 10))
 
-	bkeys, err := s.kvs.DelPrefix(kv.Key([]byte(p)))
+	bkeys, err := s.kvdb.DelPrefix(kv.Key([]byte(p)))
 	s.Nil(err)
 	s.True(len(bkeys) == 10)
 	for _, k := range bkeys {
 		s.True(strings.HasPrefix(string(k), p))
 	}
 
-	remainingKeys, err := s.kvs.GetPrefix(kv.Key([]byte("")))
+	remainingKeys, err := s.kvdb.GetPrefix(kv.Key([]byte("")))
 	s.Nil(err)
 	for _, kv := range remainingKeys {
 		s.False(strings.HasPrefix(string(kv.K), p))
 	}
+}
+
+func ExampleKV_Dump() {
+	kvs := kv.NewMemoryKV()
+
+	kvs.Put(kv.Key("key-2"), kv.Value("value-2"))
+	kvs.Put(kv.Key("key-1"), kv.Value("value-1"))
+	kvs.Put(kv.Key("key-3"), kv.Value("general value"))
+
+	fmt.Print(kvs.Dump())
+	// Output:
+	// key-1 value-1
+	// key-2 value-2
+	// key-3 general value
 }
