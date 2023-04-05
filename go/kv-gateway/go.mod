@@ -3,6 +3,7 @@ module github.com/egustafson/sandbox/go/kv-gateway
 go 1.20
 
 require (
+	github.com/egustafson/werks v0.0.0-20230404051841-a5f64a02e16e
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.2
 )

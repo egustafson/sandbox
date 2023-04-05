@@ -1,12 +1,13 @@
 package protogw_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/egustafson/sandbox/go/kv-gateway/kv"
 	"github.com/egustafson/sandbox/go/kv-gateway/protogw"
+	"github.com/egustafson/werks/kv"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 )
@@ -41,40 +42,38 @@ func (s *ProtoGwTestSuite) TestProtoGateway_Close() {
 	s.ErrorAs(err, &closedError)
 }
 
-func (s *ProtoGwTestSuite) TestProtoGateway_GetProducer() {
-	p := protogw.Producer{
-		ID:    uuid.New(),
-		Name:  "test-producer",
-		Value: 123,
+func (s *ProtoGwTestSuite) TestProtoGateway_GetComponent() {
+	c := protogw.Component{
+		ID:   uuid.New(),
+		Name: "test-component",
 	}
 
-	err := s.protoGw.SetProducer(p)
+	err := s.protoGw.SetComponent(c)
 	s.Nil(err)
 
-	result, err := s.protoGw.GetProducer(p.ID)
+	result, err := s.protoGw.GetComponent(c.ID)
 	if s.Nil(err) {
-		s.Equal(p, result)
+		s.Equal(c, result)
 	}
 }
 
-func (s *ProtoGwTestSuite) TestProtoGateway_GetProducers() {
-	producers := make(map[int]protogw.Producer)
+func (s *ProtoGwTestSuite) TestProtoGateway_GetAllComponents() {
+	components := make(map[string]protogw.Component)
 	for i := 0; i < 10; i++ {
-		p := protogw.Producer{
-			ID:    uuid.New(),
-			Name:  fmt.Sprintf("test-producer-%d", i),
-			Value: i,
+		p := protogw.Component{
+			ID:   uuid.New(),
+			Name: fmt.Sprintf("test-component-%d", i),
 		}
-		producers[i] = p
-		err := s.protoGw.SetProducer(p)
+		components[p.Name] = p
+		err := s.protoGw.SetComponent(p)
 		s.Nil(err)
 	}
 
-	results, err := s.protoGw.GetProducers()
+	results, err := s.protoGw.GetAllComponents()
 	if s.Nil(err) {
-		s.Equal(len(producers), len(results))
+		s.Equal(len(components), len(results))
 		for _, r := range results {
-			p, ok := producers[r.Value]
+			p, ok := components[r.Name]
 			if s.True(ok) {
 				s.Equal(p, r)
 			}
@@ -87,7 +86,7 @@ func (s *ProtoGwTestSuite) TestProtoGateway_GetAllLogs() {
 	for i := 0; i < 10; i++ {
 		lr := protogw.LogRecord{
 			TimeStamp: time.Now().UTC(),
-			Producer:  uuid.New(),
+			Sender:    uuid.New(),
 			Message:   fmt.Sprintf("log-message-%d", i),
 		}
 		logs[lr.Message] = lr
@@ -104,5 +103,78 @@ func (s *ProtoGwTestSuite) TestProtoGateway_GetAllLogs() {
 				s.Equal(lr, r)
 			}
 		}
+	}
+}
+
+func observeLogOrTimeout(logCh <-chan protogw.LogRecord) (protogw.LogRecord, bool) {
+	select {
+	case lr := <-logCh:
+		return lr, true
+	case <-time.After(time.Millisecond):
+		return protogw.LogRecord{}, false
+	}
+}
+
+func (s *ProtoGwTestSuite) TestProtoGateway_ObserveLogs() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	logWatcher, err := s.protoGw.ObserveLogs(ctx)
+	s.Nil(err)
+
+	logUUID := uuid.New()
+	for i := 0; i < 10; i++ {
+		sendLR := protogw.LogRecord{
+			TimeStamp: time.Now().UTC(),
+			Sender:    logUUID,
+			Message:   fmt.Sprintf("message-%d", i),
+		}
+		err = s.protoGw.SendLogRecord(sendLR)
+		s.Nil(err)
+
+		recvLR, ok := observeLogOrTimeout(logWatcher)
+		if s.True(ok) {
+			s.Equal(sendLR, recvLR)
+		}
+	}
+}
+
+func observeGaugeOrTimeout(gCh <-chan protogw.GaugeState) (int, bool) {
+	select {
+	case gauge := <-gCh:
+		return gauge.Value, true
+	case <-time.After(time.Millisecond):
+		return 0, false
+	}
+}
+
+func (s *ProtoGwTestSuite) TestProtoGateway_Gauge() {
+	gID := uuid.New()
+	err := s.protoGw.CreateGauge(gID, "gauge-under-test") // validate CreateGauge
+	s.Nil(err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	gWatcher, err := s.protoGw.ObserveGauge(ctx, gID) // validate ObserveGauge
+	s.Nil(err)
+
+	for i := 10; i < 20; i++ {
+		err = s.protoGw.SetGauge(gID, i) // validate SetGauge
+		s.Nil(err)
+
+		r, ok := observeGaugeOrTimeout(gWatcher) // validate observer respondes
+		s.True(ok)
+		s.Equal(i, r)
+	}
+
+	// Validate that observers buffer (some) in order.
+	for i := 50; i < 55; i++ {
+		err = s.protoGw.SetGauge(gID, i) // validate SetGauge
+		s.Nil(err)
+	}
+
+	for i := 50; i < 55; i++ {
+		r, ok := observeGaugeOrTimeout(gWatcher) // validate observer respondes
+		s.True(ok)
+		s.Equal(i, r)
 	}
 }
