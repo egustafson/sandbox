@@ -8,4 +8,4 @@ Goal-2:  use the VSCode plugin to perform the work.
 
 ## Diagram
 
-![svg diagram](diagram.svg)
+![svg diagram](diagram.drawio.svg)
