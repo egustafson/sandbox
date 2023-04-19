@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/egustafson/sandbox/_hybrid/grpc-tls-python-golang/client-go/pb"
+	"github.com/egustafson/sandbox/grpc/grpc-tls-python-golang/client-go/pb"
 )
 
 const (

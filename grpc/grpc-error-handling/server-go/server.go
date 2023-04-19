@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/egustafson/sandbox/_hybrid/grpc-error-handling/server-go/pb"
+	"github.com/egustafson/sandbox/grpc/grpc-error-handling/server-go/pb"
 )
 
 const (

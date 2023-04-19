@@ -1,9 +1,8 @@
-module github.com/egustafson/sandbox/grpc_mixed_language/grpc-metadata/client-go
+module github.com/egustafson/sandbox/grpc/grpc-metadata/client-go
 
 go 1.20
 
 require (
-	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 )
@@ -13,4 +12,5 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 )

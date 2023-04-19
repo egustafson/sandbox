@@ -12,7 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/egustafson/sandbox/_hybrid/grpc-tls-python-golang/server-go/pb"
+	"github.com/egustafson/sandbox/grpc/grpc-tls-python-golang/server-go/pb"
 )
 
 const (

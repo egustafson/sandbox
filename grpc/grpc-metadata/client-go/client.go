@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/egustafson/sandbox/grpc_mixed_language/grpc-metadata/client-go/pb"
+	"github.com/egustafson/sandbox/grpc/grpc-metadata/client-go/pb"
 )
 
 const (

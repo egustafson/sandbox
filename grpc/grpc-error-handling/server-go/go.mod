@@ -1,4 +1,4 @@
-module github.com/egustafson/sandbox/_hybrid/grpc-error-handling/server-go
+module github.com/egustafson/sandbox/grpc/grpc-error-handling/server-go
 
 go 1.17
 

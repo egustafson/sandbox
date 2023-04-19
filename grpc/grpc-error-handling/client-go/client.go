@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	"github.com/egustafson/sandbox/_hybrid/grpc-error-handling/client-go/pb"
+	"github.com/egustafson/sandbox/grpc/grpc-error-handling/client-go/pb"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/egustafson/sandbox/_hybrid/grpc-tls-python-golang/client-go
+module github.com/egustafson/sandbox/grpc/grpc-tls-python-golang/client-go
 
 go 1.16
 
