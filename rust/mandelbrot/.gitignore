@@ -1,0 +1,9 @@
+/mandel.png
+/.vscode
+
+# --  Rust ignores  -------------------
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
