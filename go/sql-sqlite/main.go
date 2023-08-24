@@ -3,9 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -34,7 +35,7 @@ func main() {
 
 	printDrivers()
 
-	fmt.Printf("db: %V\n", db)
+	fmt.Printf("db: %v\n", db)
 
 	fmt.Println("--")
 	fmt.Println("done.")
