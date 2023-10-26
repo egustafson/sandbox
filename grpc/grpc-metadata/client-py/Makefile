@@ -9,20 +9,20 @@ PROTOC = python -m grpc_tools.protoc
 PROTOC_FLAGS = -I${PROTODIR} --python_out=. --grpc_python_out=.
 
 
-.PHONEY: build
+.PHONY: build
 build: ${PBFILES}
 
 ${PBFILES}: ${PROTOS}
 	${PROTOC} ${PROTOC_FLAGS} $?
 
-.PHONEY: clean
+.PHONY: clean
 clean:
 	@-rm -rf `find . -name __pycache__`
 
-.PHONEY: realclean
+.PHONY: realclean
 realclean: clean
 	-rm -f *_pb2*.py
 
-.PHONEY: grpc-help
+.PHONY: grpc-help
 grpc-help:
 	python -m grpc_tools.protoc -h
