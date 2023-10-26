@@ -2,6 +2,10 @@
 
 # from __future__ import print_function
 import logging
+import os
+import socket
+import sys
+
 import grpc
 from grpc_status import rpc_status
 
@@ -21,19 +25,31 @@ def run():
     ch = grpc.insecure_channel(LISTEN_ADDR)
 
     stub = service_pb2_grpc.SvcStub(ch)
-    doRequest(stub, "random-req-msg-python")
-    doRequest(stub, "ok-req-msg")
-    doRequest(stub, "err-req-msg")
-    doRequest(stub, "err-internal-req-msg")
-    doRequest(stub, "err-abort-req-msg")
-    doRequest(stub, "err-timeout")  # server will delay response for 1 hr
+    doRequest(stub, "client-request-py")
+    ch.close()
 
 
 def doRequest(stub: service_pb2_grpc.SvcStub, msg: str) -> None:
+    """Invoke `SvcRequest` with `msg`, adding call headers and logging response headers"""
+    hostname = socket.gethostname()
+    pid = "{}".format(os.getpid())
+    md = (  # call metadata
+        ('hostname', hostname),
+        ('client-pid', pid),
+        ('python-version', sys.version)
+    )
+
     req = service_pb2.SvcRequest(req_text=msg)
     try:
-        resp = stub.DoService(req, timeout=TIMEOUT_DURATION)  # <-- timeout
+        resp, call = stub.DoService.with_call(req, metadata=md, timeout=TIMEOUT_DURATION)  # <-- timeout
+
         logging.info("response: {}".format(resp.resp_text))
+        logging.info("  Header:")
+        for key, value in call.initial_metadata():
+            logging.info("  - {}: {}".format(key, value))
+        logging.info("  Footer:")
+        for key, value in call.trailing_metadata():
+            logging.info("  - {}: {}".format(key, value))
     except grpc.RpcError as e:
         logStatus(e)
     except BaseException as e:
@@ -42,6 +58,7 @@ def doRequest(stub: service_pb2_grpc.SvcStub, msg: str) -> None:
 
 
 def logStatus(e: grpc.RpcError) -> None:
+    """Dissect the response grpc error and log the error's component parts"""
     logging.info("----------------------------------")
     # logging.info("gRPC returned error: {}".format(e))
     # logging.info("  trailing_metadata:  {}".format(e.trailing_metadata()))
