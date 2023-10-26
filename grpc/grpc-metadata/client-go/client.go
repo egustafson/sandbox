@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"runtime"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/egustafson/sandbox/grpc/grpc-metadata/client-go/pb"
 )
@@ -34,23 +37,34 @@ func main() {
 
 	svc := pb.NewSvcClient(conn)
 
-	doRequest(svc, "random-req-msg-golang")
-	doRequest(svc, "ok-req-msg")
-	doRequest(svc, "err-req-msg")
-	doRequest(svc, "err-internal-req-msg")
-	doRequest(svc, "err-abort-req-msg") // emits an ErrorInfo
-	doRequest(svc, "err-timeout")       // cause service to delay 1 hr
+	doRequest(svc, "client-request")
 }
 
 func doRequest(svc pb.SvcClient, msg string) {
 	deadline := time.Now().Add(timeout_duration) // <-- timeout
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
+
+	// send hostname and pid as grpc metadata
+	hostname, _ := os.Hostname()
+	pid := fmt.Sprintf("%d", os.Getpid())
+	md := metadata.Pairs(
+		"app-hostname", hostname,
+		"app-pid", pid,
+		"app-language", "go",
+		"app-language-version", runtime.Version(),
+	)
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	var header, trailer metadata.MD
+
 	req := &pb.SvcRequest{ReqText: msg}
-	resp, err := svc.DoService(ctx, req)
+	resp, err := svc.DoService(ctx, req, grpc.Header(&header), grpc.Trailer(&trailer))
 	if err != nil {
 		log.Printf("unexpected ERROR: %v", err)
 		return
 	}
 	log.Printf("response:  %s", resp.RespText)
+
+	// TODO:  print the header and trailer that we pulled out of the gRPC call
 }
