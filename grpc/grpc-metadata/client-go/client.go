@@ -66,5 +66,17 @@ func doRequest(svc pb.SvcClient, msg string) {
 	}
 	log.Printf("response:  %s", resp.RespText)
 
+	log.Print("  Header:")
+	for k, vSlice := range header {
+		for _, v := range vSlice {
+			log.Printf("  - %s: %s", k, v)
+		}
+	}
+	log.Print("  Trailer:")
+	for k, vSlice := range trailer {
+		for _, v := range vSlice {
+			log.Printf("  - %s: %s", k, v)
+		}
+	}
 	// TODO:  print the header and trailer that we pulled out of the gRPC call
 }
