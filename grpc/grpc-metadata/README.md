@@ -8,3 +8,8 @@ Streaming Request/Response.
 ## References
 
 * https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+* https://grpc.io/docs/guides/metadata/
+
+### Golang Ref
+
+* https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md
