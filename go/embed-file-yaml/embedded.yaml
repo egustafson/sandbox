@@ -1,0 +1,8 @@
+---
+demo:
+  string: a string value
+  integer: 21
+  float: 3.1415
+  boolean: true
+  duration: 2m7s
+...
