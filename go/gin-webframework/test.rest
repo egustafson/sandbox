@@ -1,0 +1,7 @@
+@baseUrl = http://localhost:8080
+
+### /healthz
+GET {{baseUrl}}/healthz
+
+### mdl handler
+GET {{baseUrl}}/mdl/some-type/{{$guid}}

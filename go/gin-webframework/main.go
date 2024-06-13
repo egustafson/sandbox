@@ -1,10 +1,11 @@
 package main
 
 import (
-	"gopkg.in/gin-gonic/gin.v1"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func healthzHandler(c *gin.Context) {
