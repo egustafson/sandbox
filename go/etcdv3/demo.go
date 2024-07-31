@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
@@ -41,7 +40,7 @@ func main() {
 
 	printClusterInfo(ctx, client)
 	GetSingleValueDemo(ctx, client)
-	GetMultipleValuesWithPaginationDemo(ctx, client)
+	// GetMultipleValuesWithPaginationDemo(ctx, client)  // <- BROKEN
 }
 
 func checkErr(msg string, err error) {
@@ -101,48 +100,54 @@ func GetSingleValueDemo(ctx context.Context, kv clientv3.KV) {
 
 func GetMultipleValuesWithPaginationDemo(ctx context.Context, kv clientv3.KV) {
 
-	fmt.Println(" ---  Pagination Demo  ---")
+	// BROKEN Demo - This example will not paginate properly.  Entries AFTER the
+	// prefix range will be included in the final page.
+	//
+	// See ../etcdv3_paginate for a working example.
+	panic("BROKEN demo")
 
-	// delete all keys
-	_, err := kv.Delete(ctx, "key", clientv3.WithPrefix())
-	checkErr("del('key*') failed", err)
+	// fmt.Println(" ---  Pagination Demo  ---")
 
-	// Insert 20 unique keys
-	for ii := 0; ii < 20; ii++ {
-		k := fmt.Sprintf("key_%02d", ii)
-		_, err = kv.Put(ctx, k, strconv.Itoa(ii))
-		checkErr("put('key_??') failed", err)
-	}
+	// // delete all keys
+	// _, err := kv.Delete(ctx, "key", clientv3.WithPrefix())
+	// checkErr("del('key*') failed", err)
 
-	opts := []clientv3.OpOption{
-		clientv3.WithPrefix(), // ==> get a range
-		clientv3.WithSort(clientv3.SortByKey, clientv3.SortAscend), // sorted so pagination works
-		clientv3.WithLimit(5), // limit "page" to 5 in order to demo paging
-	}
+	// // Insert 20 unique keys
+	// for ii := 0; ii < 20; ii++ {
+	// 	k := fmt.Sprintf("key_%02d", ii)
+	// 	_, err = kv.Put(ctx, k, strconv.Itoa(ii))
+	// 	checkErr("put('key_??') failed", err)
+	// }
 
-	var nextkey = "key"
-	var firstPass = true
-	gr, err := kv.Get(ctx, nextkey, opts...)
-	checkErr("get('key') <page 1> failed", err)
-	for {
-		var firstIndex = 1
-		if firstPass {
-			firstIndex = 0
-			opts = append(opts, clientv3.WithFromKey()) // apply after the initial Get()
-			firstPass = false
-		}
-		fmt.Println("--- page ---")
-		for _, item := range gr.Kvs[firstIndex:] {
-			fmt.Println(string(item.Key), string(item.Value))
-		}
-		if !gr.More { // bottom tested loop
-			break
-		}
-		nextkey = string(gr.Kvs[len(gr.Kvs)-1].Key)
-		gr, err = kv.Get(ctx, nextkey, opts...)
-		checkErr("get('key...') <next page> failed", err)
-	}
-	fmt.Println("--- end ---")
+	// opts := []clientv3.OpOption{
+	// 	clientv3.WithPrefix(), // ==> get a range
+	// 	clientv3.WithSort(clientv3.SortByKey, clientv3.SortAscend), // sorted so pagination works
+	// 	clientv3.WithLimit(5), // limit "page" to 5 in order to demo paging
+	// }
+
+	// var nextkey = "key"
+	// var firstPass = true
+	// gr, err := kv.Get(ctx, nextkey, opts...)
+	// checkErr("get('key') <page 1> failed", err)
+	// for {
+	// 	var firstIndex = 1
+	// 	if firstPass {
+	// 		firstIndex = 0
+	// 		opts = append(opts, clientv3.WithFromKey()) // apply after the initial Get()
+	// 		firstPass = false
+	// 	}
+	// 	fmt.Println("--- page ---")
+	// 	for _, item := range gr.Kvs[firstIndex:] {
+	// 		fmt.Println(string(item.Key), string(item.Value))
+	// 	}
+	// 	if !gr.More { // bottom tested loop
+	// 		break
+	// 	}
+	// 	nextkey = string(gr.Kvs[len(gr.Kvs)-1].Key)
+	// 	gr, err = kv.Get(ctx, nextkey, opts...)
+	// 	checkErr("get('key...') <next page> failed", err)
+	// }
+	// fmt.Println("--- end ---")
 }
 
 func printClusterInfo(ctx context.Context, client *clientv3.Client) {
