@@ -1,11 +1,8 @@
-use std::{
-    collections::HashMap,
-    error::Error,
-};
+use std::{collections::HashMap, error::Error};
 
 pub trait CommandRegistry {
     fn register(&mut self, handler: Box<dyn CommandHandler>) -> Result<(), Box<dyn Error>>;
-    fn lookup(&self, cmd_line: &str) -> Option<Box<dyn CommandHandler>>;
+    fn lookup(&self, cmd_line: &str) -> Option<&Box<dyn CommandHandler>>;
 }
 
 pub trait CommandHandler {
@@ -13,13 +10,13 @@ pub trait CommandHandler {
 }
 
 struct CommandRepo {
-    handlers: HashMap<String, Box<dyn CommandHandler>>
+    handlers: HashMap<String, Box<dyn CommandHandler>>,
 }
 
 impl CommandRepo {
     pub fn new() -> CommandRepo {
-        CommandRepo{
-            handlers: HashMap::new()
+        CommandRepo {
+            handlers: HashMap::new(),
         }
     }
 }
@@ -30,19 +27,27 @@ impl CommandRegistry for CommandRepo {
         Ok(())
     }
 
-    fn lookup(&self, cmd_line: &str) -> Option<Box<dyn CommandHandler>> {
-        let (cmd, args) = parse_cmd_line(cmd_line);
+    fn lookup(&self, cmd_line: &str) -> Option<&Box<dyn CommandHandler>> {
+        let (mut cmd, mut args) = parse_cmd_line(cmd_line);
 
-        None
+        loop {
+            if cmd.len() < 1 {
+                return None;  // no command prefix found
+            }
+            let cmd_str = cmd.join(" ");
+            match self.handlers.get(&cmd_str) {
+                Some(handler) => return Some(handler),
+                None => (), // fall through
+            }
+            // shift tail of cmd tokens onto head of arg list
+            args.insert(0, cmd.pop()?)
+        }
     }
 }
 
 fn parse_cmd_line(cmd_line: &str) -> (Vec<String>, Vec<String>) {
     let mut cmd = Vec::new();
-    let mut args: Vec<String> = cmd_line
-        .split_whitespace()
-        .map(|s| s.to_string())
-        .collect();
+    let mut args: Vec<String> = cmd_line.split_whitespace().map(|s| s.to_string()).collect();
     loop {
         if args.len() > 0 {
             let a = &args[0];
@@ -51,9 +56,9 @@ fn parse_cmd_line(cmd_line: &str) -> (Vec<String>, Vec<String>) {
                     if c.is_alphabetic() {
                         cmd.push(args.remove(0));
                     } else {
-                        break
+                        break;
                     }
-                },
+                }
                 None => break,
             }
         } else {
@@ -68,7 +73,7 @@ mod tests {
     use super::*;
 
     struct MockHandler {
-        usage: String
+        usage: String,
     }
 
     impl CommandHandler for MockHandler {
@@ -80,7 +85,9 @@ mod tests {
     #[test]
     fn create_registry() {
         let mut cr = CommandRepo::new();
-        let h = Box::new(MockHandler{usage: String::from("placeholder")});
+        let h = Box::new(MockHandler {
+            usage: String::from("placeholder"),
+        });
         assert!(cr.register(h).is_ok());
         assert!(cr.lookup("cmd sub -flag").is_none());
     }
