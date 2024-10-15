@@ -22,6 +22,11 @@ func main() {
 	}
 	defer db.Close()
 
+	if err = db.Ping(); err != nil {
+		fmt.Printf("error pinging DB: %v\n", err)
+		return
+	}
+
 	sqlStmt := `
       create table foo (id integer not null primary key, name text);
       delete from foo;
@@ -43,7 +48,7 @@ func main() {
 
 func printDrivers() {
 	fmt.Println("sql Drivers:")
-	for d := range sql.Drivers() {
+	for _, d := range sql.Drivers() {
 		fmt.Printf("  %v\n", d)
 	}
 	fmt.Println("--")

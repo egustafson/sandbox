@@ -1,0 +1,5 @@
+# customizations to sqlx-sqlite-atlas repo
+#
+# golang default .gitignore included in parent directory
+
+/demo.db
