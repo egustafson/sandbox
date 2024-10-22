@@ -3,11 +3,12 @@ version: '3.3'
 
 services:
   mosquitto:
-    image: eclipse-mosquitto
+    image: eclipse-mosquitto:openssl
     container_name: mosquitto
-    user: "1000:1000"         # <- CHANGE
+    user: "1001:1001"         # <- CHANGE
     ports:
       - "1883:1883"
+      - "8883:8883"
       - "9001:9001"
     volumes:
       - ./config:/mosquitto/config
