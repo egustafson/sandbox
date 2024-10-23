@@ -1,4 +1,4 @@
-FROM golang:bookworm as build-env
+FROM golang:bookworm AS build-env
 
 WORKDIR /go/src/app
 ADD . /go/src/app/

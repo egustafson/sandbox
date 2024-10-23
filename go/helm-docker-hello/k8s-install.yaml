@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello
+  labels:
+    app: hello
+spec:
+  containers:
+    - name: hello
+      image: hello-docker:0.1
+      ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello
+spec:
+  type: NodePort
+  ports:
+    - port: 8080         # port exposed within the cluster
+      nodePort: 30080    # port accessible externally
+  selector:
+    app: hello           # select pods with this label
+
