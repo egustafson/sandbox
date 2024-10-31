@@ -1,0 +1,8 @@
+apiVersion: v2
+name: hello
+description: A Helm chart for the 'hello' demo application
+type: application
+version: 0.1.0     # the helm chart version
+appVersion: 0.1.0  # the hello.go application version
+sources: 
+  - https://github.com/egustafson/sandbox/go/helm-docker-hello

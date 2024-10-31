@@ -4,11 +4,11 @@ kind: Pod
 metadata:
   name: hello
   labels:
-    app: hello
+    app.kubernetes.io/name: hello
 spec:
   containers:
     - name: hello
-      image: hello-docker:0.1
+      image: hello-docker:0.1.0
       ports:
         - containerPort: 8080
 ---
@@ -22,5 +22,5 @@ spec:
     - port: 8080         # port exposed within the cluster
       nodePort: 30080    # port accessible externally
   selector:
-    app: hello           # select pods with this label
+    app.kubernetes.io/name: hello  # select pods with this label
 
