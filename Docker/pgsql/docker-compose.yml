@@ -1,0 +1,20 @@
+---
+version: '3.9'
+
+services:
+
+  postgresql:
+    user: "1000:1000"  # user: ericg
+    image: postgres:17-bookworm
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    ports:
+      - 5432:5432
+    volumes:
+      - type: bind
+        source: ./pgdata              # <-- must be CREATED
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: demo
+...
