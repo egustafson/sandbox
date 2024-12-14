@@ -1,17 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/egustafson/go/testfw-reflection/demofwk"
 )
 
-type DemoTestSuite struct{}
-
 func init() {
-	demofwk.Register(new(DemoTestSuite))
+	demofwk.Register(DemoTest)
 }
 
-func (dts *DemoTestSuite) TestFuncOne() {
-	fmt.Println("TestFuncOne")
+func DemoTest(t *demofwk.T) {
+	slog.Info("DemoTest - running", slog.String("name", t.Name))
 }
