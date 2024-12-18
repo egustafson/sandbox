@@ -8,23 +8,32 @@ import (
 	"sync"
 )
 
+type RunnableRec struct {
+	Name string
+	R    Runnable
+}
+
 type Registry struct {
-	runnables []Runnable
+	runnables []*RunnableRec
 	mu        sync.Mutex
 }
 
 var registry *Registry = newRegistry()
 
 func Register(runnable Runnable) {
+	rr := &RunnableRec{
+		Name: runtime.FuncForPC(reflect.ValueOf(runnable).Pointer()).Name(),
+		R:    runnable,
+	}
 	registry.mu.Lock()
 	defer registry.mu.Unlock()
 
-	registry.runnables = append(registry.runnables, runnable)
+	registry.runnables = append(registry.runnables, rr)
 }
 
 func newRegistry() *Registry {
 	return &Registry{
-		runnables: make([]Runnable, 0),
+		runnables: make([]*RunnableRec, 0),
 	}
 }
 
@@ -40,9 +49,9 @@ func newRootT() *T {
 func Run() {
 	slog.Info("Run.demofwk - start")
 	rootT := newRootT()
-	for _, r := range registry.runnables {
-		name := runtime.FuncForPC(reflect.ValueOf(r).Pointer()).Name()
-		rootT.Run(name, r)
+	for _, rr := range registry.runnables {
+		name := rr.Name
+		rootT.Run(name, rr.R)
 	}
 	slog.Info("Run.demofwk - finished")
 }

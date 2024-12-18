@@ -22,5 +22,5 @@ func DemoTestSuiteRunner(t *demofwk.T) {
 }
 
 func (s *DemoTestSuite) TestDemo1() {
-	slog.Info("  --> inside fn DemoTestSuite", slog.String("name", s.T().Name))
+	slog.Info("  --> inside fn TestDemo1", slog.String("name", s.T().Name))
 }

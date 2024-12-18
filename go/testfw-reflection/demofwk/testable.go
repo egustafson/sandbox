@@ -17,8 +17,11 @@ type T struct {
 }
 
 func (t *T) Run(name string, fn Runnable) {
+	if len(t.Name) > 0 {
+		name = fmt.Sprintf("%s:%s", t.Name, name)
+	}
 	child := &T{
-		Name:   fmt.Sprintf("%s:%s", t.Name, name),
+		Name:   name,
 		parent: t,
 	}
 	child.ctx, child.cancel = context.WithCancel(t.ctx)

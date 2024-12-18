@@ -27,38 +27,51 @@ type SuiteHolder interface {
 
 var _ SuiteHolder = (*Suite)(nil) // type check that a *Suite isA SuiteHolder
 
+type SuiteSetupAll interface{ SetupAll() }
+type SuiteSetupTest interface{ SetupTest() }
+type SuiteTeardownAll interface{ TeardownAll() }
+type SuiteTeardownTest interface{ TeardownTest() }
+
 func RunSuite(t *T, s SuiteHolder) {
 	slog.Info("starting suite", slog.String("name", t.Name))
 	s.SetT(t)
 	s.SetS(s)
 	//
-	runnables := []Runnable{}
+	runnables := []*RunnableRec{}
 	methodFinder := reflect.TypeOf(s)
 	suiteName := methodFinder.Elem().Name()
+	t.Name = suiteName // overwrite name of T -- probably needs more robust handling.
 	for i := 0; i < methodFinder.NumMethod(); i++ {
 		method := methodFinder.Method(i)
 		if methodRE.MatchString(method.Name) {
-			slog.Info("method", slog.String("name", method.Name), slog.String("suite", suiteName))
-			r := func(t *T) {
-				defer func() { // teardown hook
-					// add hooks to run teardown hook if it exists
-					slog.Info("- teardown hook", slog.String("method", method.Name))
-				}()
+			rr := &RunnableRec{
+				Name: method.Name,
+				R: func(t *T) {
+					defer func() { // teardown hook
+						if suiteTeardown, ok := s.(SuiteTeardownTest); ok {
+							suiteTeardown.TeardownTest()
+						}
+					}()
 
-				// setup hook
-				slog.Info(" - setup hook", slog.String("method", method.Name))
-				method.Func.Call([]reflect.Value{reflect.ValueOf(s)})
+					if suiteSetup, ok := s.(SuiteSetupTest); ok {
+						suiteSetup.SetupTest()
+					}
+					method.Func.Call([]reflect.Value{reflect.ValueOf(s)})
+				},
 			}
-			runnables = append(runnables, r)
+			runnables = append(runnables, rr)
 		}
 	}
 
-	for _, r := range runnables {
-		t.Run("child-need-name", r)
+	if suiteSetup, ok := s.(SuiteSetupAll); ok {
+		suiteSetup.SetupAll()
 	}
-	//
-	// TODO
-	//
+	for _, rr := range runnables {
+		t.Run(rr.Name, rr.R)
+	}
+	if suiteTeardown, ok := s.(SuiteTeardownAll); ok {
+		suiteTeardown.TeardownAll()
+	}
 	slog.Info("completed suite", slog.String("name", t.Name))
 }
 
