@@ -13,10 +13,14 @@ type DemoTestSuite struct {
 	suiteInitialized bool
 }
 
+func init() {
+	demofwk.Register(DemoTestSuiteRunner)
+}
+
 func DemoTestSuiteRunner(t *demofwk.T) {
 	demofwk.RunSuite(t, new(DemoTestSuite))
 }
 
 func (s *DemoTestSuite) TestDemo1() {
-	slog.Info("DemoTestSuite running", slog.String("name", s.T().Name))
+	slog.Info("  --> inside fn DemoTestSuite", slog.String("name", s.T().Name))
 }

@@ -11,5 +11,5 @@ func init() {
 }
 
 func DemoTest(t *demofwk.T) {
-	slog.Info("DemoTest - running", slog.String("name", t.Name))
+	slog.Info("  --> inside fn DemoTest", slog.String("name", t.Name))
 }
