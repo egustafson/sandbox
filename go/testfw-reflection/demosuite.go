@@ -21,6 +21,15 @@ func DemoTestSuiteRunner(t *demofwk.T) {
 	demofwk.RunSuite(t, new(DemoTestSuite))
 }
 
-func (s *DemoTestSuite) TestDemo1() {
-	slog.Info("  --> inside fn TestDemo1", slog.String("name", s.T().Name))
+func (s *DemoTestSuite) Test1() {
+	slog.Info("  --> inside suite DemoTestSuite", slog.String("name", s.T().Name))
+}
+
+func (s *DemoTestSuite) Test2() {
+	slog.Info("  --> inside suite DemoTestSuite", slog.String("name", s.T().Name))
+}
+
+func (s *DemoTestSuite) TestPanic() {
+	slog.Info("  --> inside suite DemoTestSuite", slog.String("name", s.T().Name))
+	panic("cause a panic")
 }

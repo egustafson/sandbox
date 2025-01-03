@@ -1,57 +1,53 @@
 package demofwk
 
 import (
-	"context"
 	"log/slog"
 	"reflect"
 	"runtime"
 	"sync"
 )
 
-type RunnableRec struct {
+type TestFn func(t *T)
+
+type TestRec struct {
 	Name string
-	R    Runnable
+	Fn   TestFn
 }
 
 type Registry struct {
-	runnables []*RunnableRec
-	mu        sync.Mutex
+	tests []*TestRec
+	lock  sync.Mutex
 }
 
 var registry *Registry = newRegistry()
 
-func Register(runnable Runnable) {
-	rr := &RunnableRec{
-		Name: runtime.FuncForPC(reflect.ValueOf(runnable).Pointer()).Name(),
-		R:    runnable,
+func Register(testfn TestFn) {
+	rr := &TestRec{
+		Name: runtime.FuncForPC(reflect.ValueOf(testfn).Pointer()).Name(),
+		Fn:   testfn,
 	}
-	registry.mu.Lock()
-	defer registry.mu.Unlock()
+	registry.lock.Lock()
+	defer registry.lock.Unlock()
 
-	registry.runnables = append(registry.runnables, rr)
+	registry.tests = append(registry.tests, rr)
 }
 
 func newRegistry() *Registry {
 	return &Registry{
-		runnables: make([]*RunnableRec, 0),
+		tests: make([]*TestRec, 0),
 	}
 }
 
 func newRootT() *T {
-	t := &T{
-		Name:     "",
-		children: make([]*T, 0),
-	}
-	t.ctx, t.cancel = context.WithCancel(context.Background())
-	return t
+	return newT(nil, "")
 }
 
 func Run() {
 	slog.Info("Run.demofwk - start")
 	rootT := newRootT()
-	for _, rr := range registry.runnables {
-		name := rr.Name
-		rootT.Run(name, rr.R)
+	for _, tr := range registry.tests {
+		name := tr.Name
+		rootT.Run(name, tr.Fn)
 	}
 	slog.Info("Run.demofwk - finished")
 }
