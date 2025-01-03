@@ -33,3 +33,14 @@ func (s *DemoTestSuite) TestPanic() {
 	slog.Info("  --> inside suite DemoTestSuite", slog.String("name", s.T().Name))
 	panic("cause a panic")
 }
+
+func (s *DemoTestSuite) TestNested() {
+	slog.Info("  --> inside suite DemoTestSuite", slog.String("name", s.T().Name))
+	s.T().Run("nested-1", func(t *demofwk.T) {
+		slog.Info("    --> nested test", slog.String("name", t.Name))
+	})
+	s.T().Run("nested-2", func(t *demofwk.T) {
+		slog.Info("    --> nested test", slog.String("name", t.Name))
+	})
+	slog.Info("  --> ending nested suite test", slog.String("name", s.T().Name))
+}

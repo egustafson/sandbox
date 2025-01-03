@@ -47,15 +47,17 @@ func RunSuite(t *T, s SuiteHolder) {
 			tr := &TestRec{
 				Name: method.Name,
 				Fn: func(t *T) {
+					// make the suite's T == this test's T.  The suite's T is
+					// reset with the teardown hook.
+					parentT := s.T()
+					s.SetT(t)
+
 					defer func() { // teardown hook
 						if suiteTeardown, ok := s.(SuiteTeardownTest); ok {
 							suiteTeardown.TeardownTest()
 						}
+						s.SetT(parentT) // set the suite's T back to
 					}()
-
-					// make the suite's T == this test's T.  The suite's T is
-					// reset with a deferred SetT() in RunSuite.
-					s.SetT(t)
 
 					if suiteSetup, ok := s.(SuiteSetupTest); ok {
 						suiteSetup.SetupTest()
