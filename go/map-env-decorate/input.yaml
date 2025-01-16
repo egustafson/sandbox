@@ -1,0 +1,18 @@
+---
+obj1:
+  key1: untranslated
+  key2: "$TRANSLATE"
+obj2:
+  key3: random value that should not be translated
+  key4: "$USERNAME"
+obj3:
+  id: random-id
+  val: 21
+  float: 3.14159
+  complex: 
+    re: 7.6
+    im: 2.71828
+  creds:
+    user: $USERNAME
+    pass: $PASSWORD
+...
