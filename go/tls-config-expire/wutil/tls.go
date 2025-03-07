@@ -100,30 +100,9 @@ func MakeTlsConfig(profile *TlsProfile) (cfg *TlsConfig, err error) {
 // tls.Config.Certificates[], and returns the most restrictive (latest in time)
 // value of NotBefore.
 func (cfg *TlsConfig) AllNotBefore() (time.Time, error) {
-	earliest := time.Date(0000, 1, 1, 1, 0, 0, 0, time.UTC) // impossibly far in the past
+	latest := time.Date(0000, 1, 1, 1, 0, 0, 0, time.UTC) // impossibly far in the past
 	if cfg == nil {
-		return earliest, errors.New("TlsConfig uninitialized (nil)")
-	}
-
-	for _, cert := range cfg.Certificates[0].Certificate {
-		x509cert, err := x509.ParseCertificate(cert)
-		if err != nil {
-			return earliest, err
-		}
-		if earliest.Before(x509cert.NotBefore) {
-			earliest = x509cert.NotBefore
-		}
-	}
-	return earliest, nil
-}
-
-// AllNotAfter scans the entire certificate chain, only the first chain in
-// tls.Config.Certificates[], and returns the most restrictive (earliest in
-// time) value of NotAfter.
-func (cfg *TlsConfig) AllNotAfter() (time.Time, error) {
-	latest := time.Date(9999, 12, 31, 23, 59, 59, 9, time.UTC) // impossibly far in the future
-	if cfg == nil {
-		return latest, errors.New("TlsConfig uninitalized (nil)")
+		return latest, errors.New("TlsConfig uninitialized (nil)")
 	}
 
 	for _, cert := range cfg.Certificates[0].Certificate {
@@ -131,11 +110,32 @@ func (cfg *TlsConfig) AllNotAfter() (time.Time, error) {
 		if err != nil {
 			return latest, err
 		}
-		if latest.After(x509cert.NotAfter) {
-			latest = x509cert.NotAfter
+		if latest.Before(x509cert.NotBefore) {
+			latest = x509cert.NotBefore
 		}
 	}
 	return latest, nil
+}
+
+// AllNotAfter scans the entire certificate chain, only the first chain in
+// tls.Config.Certificates[], and returns the most restrictive (earliest in
+// time) value of NotAfter.
+func (cfg *TlsConfig) AllNotAfter() (time.Time, error) {
+	earliest := time.Date(9999, 12, 31, 23, 59, 59, 9, time.UTC) // impossibly far in the future
+	if cfg == nil {
+		return earliest, errors.New("TlsConfig uninitalized (nil)")
+	}
+
+	for _, cert := range cfg.Certificates[0].Certificate {
+		x509cert, err := x509.ParseCertificate(cert)
+		if err != nil {
+			return earliest, err
+		}
+		if earliest.After(x509cert.NotAfter) {
+			earliest = x509cert.NotAfter
+		}
+	}
+	return earliest, nil
 }
 
 func (cfg *TlsConfig) normalizeToPEMs(profile *TlsProfile) (err error) {

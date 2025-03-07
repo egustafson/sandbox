@@ -42,21 +42,28 @@ func TestAllNotAfter_nil(t *testing.T) {
 	}
 }
 
-func TestMakeingCertificates(t *testing.T) {
+func TestMakingCertificates(t *testing.T) {
 	now := time.Now()
 
-	caCert, caKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Hour), nil, nil, 0)
-	intCert, intKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Hour), caCert, caKey, 1)
-	leafCert, leafKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Hour), intCert, intKey, 2)
+	caCert, caKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Minute), nil, nil, 0)
+	intCert, intKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Minute), caCert, caKey, 1)
+	leafCert, leafKey := makeCertAndKey(now.Add(-time.Hour), now.Add(time.Minute), intCert, intKey, 2)
 
 	_ = leafCert
 	_ = leafKey
 
+	intermediates := x509.NewCertPool()
+	intermediates.AddCert(intCert)
+
 	roots := x509.NewCertPool()
 	roots.AddCert(caCert)
 
-	opts := x509.VerifyOptions{Roots: roots}
-	_, err := intCert.Verify(opts)
+	opts := x509.VerifyOptions{
+		Roots:         roots,
+		Intermediates: intermediates,
+	}
+
+	_, err := leafCert.Verify(opts)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -81,6 +88,8 @@ func makeCertAndKey(start, end time.Time, signer *x509.Certificate, signerKey an
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
+		IsCA:                  true,
+		DNSNames:              []string{"localhost"},
 	}
 
 	if signer == nil { // then self-sign the certificate
