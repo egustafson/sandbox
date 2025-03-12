@@ -89,7 +89,7 @@ func MakeCertChain(opts ...CertChainOptFn) (chain CertChain) {
 		idx += 1
 	}
 
-	for idx < co.CA.MaxPathLen {
+	for idx < int(co.Length) {
 		certOps := make([]CertOptFn, 0)
 		if idx > 0 { // sign with previous cert
 			certOps = append(certOps, WithSigner(chain[idx-1].Cert, chain[idx-1].Key))
