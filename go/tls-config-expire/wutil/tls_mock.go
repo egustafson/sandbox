@@ -203,7 +203,7 @@ func MakeCertAndKey(opts ...CertOptFn) (cert *x509.Certificate, key any) {
 	}
 
 	// intended for use when unit testing and as an example of how to emit PEMs
-	const debug = false
+	const debug = true
 	if debug {
 		certPEM := pem.EncodeToMemory(&pem.Block{
 			Type:  "CERTIFICATE",

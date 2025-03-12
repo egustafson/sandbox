@@ -29,7 +29,6 @@ func LoadCertFromPEM(pemData []byte) (Cert, error) {
 		return nil, errors.New("data did not contain a certificate PEM block")
 	}
 	if _, err := x509.ParseCertificate(block.Bytes); err != nil {
-		// decoded PEM did not parse as a CERTIFICATE
 		return nil, err
 	}
 	return block.Bytes, nil
@@ -85,4 +84,8 @@ func (key *Key) AsPEM() []byte {
 		Bytes: der,
 	}
 	return pem.EncodeToMemory(block)
+}
+
+func (key *Key) AsPrivateKey() crypto.PrivateKey {
+	return &key.k
 }
