@@ -2,6 +2,7 @@ package wutil_test
 
 import (
 	"crypto/x509"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,12 +32,31 @@ func TestMakeCertAndKey(t *testing.T) {
 
 func TestMakeCertChain(t *testing.T) {
 
-	chain := wutil.MakeCertChain()
-	assert.NotNil(t, chain)
+	var chainLen []uint = []uint{1, 2, 3, 4, 5, 6}
+	for _, l := range chainLen {
+		name := fmt.Sprintf("chain-len-%d", l)
+		t.Run(name, func(t *testing.T) {
 
-	assert.True(t, len(chain) == 2) // default length is 2
+			chain := wutil.MakeCertChain(wutil.WithLength(l))
+			assert.NotNil(t, chain)
 
-	// TODO: extract ca and leaf and validate leaf against ca just like in TestMakeCertAndKey
+			assert.True(t, uint(len(chain)) == l) // default length is 2
+
+			roots := x509.NewCertPool()
+			roots.AddCert(chain.CA().Cert)
+			intermediates := x509.NewCertPool()
+			ii := chain.Intermediates()
+			for _, i := range ii {
+				intermediates.AddCert(i.Cert)
+			}
+			opts := x509.VerifyOptions{
+				Roots:         roots,
+				Intermediates: intermediates,
+			}
+
+			leaf := chain.Leaf().Cert
+			_, err := leaf.Verify(opts)
+			assert.Nil(t, err)
+		})
+	}
 }
-
-// TODO: write a test that creates a longer chain (5 ish elements) and validate the full chain

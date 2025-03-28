@@ -139,6 +139,29 @@ func WithIgnoreInconsistencies(f bool) CertChainOptFn {
 	}
 }
 
+func (c CertChain) Leaf() CertKeyPair {
+	if len(c) > 0 {
+		return c[len(c)-1]
+	}
+	return CertKeyPair{}
+}
+
+func (c CertChain) CA() CertKeyPair {
+	if len(c) > 0 {
+		return c[0]
+	}
+	return CertKeyPair{}
+}
+
+func (c CertChain) Intermediates() CertChain {
+	if len(c) > 2 {
+		left := 1
+		right := len(c) - 1
+		return c[left:right]
+	}
+	return CertChain{} // empty list
+}
+
 //
 // --  Certificate generation  ----------------------------
 //
@@ -171,6 +194,8 @@ func MakeCertAndKey(opts ...CertOptFn) (cert *x509.Certificate, key any) {
 		DNSNames:              []string{"localhost"},
 	}
 
+	// FUTURE: configurable crypto algorithms, Elliptic Curve is hard coded here.
+	//
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), crand.Reader)
 	if err != nil {
 		panic(err)
@@ -203,7 +228,7 @@ func MakeCertAndKey(opts ...CertOptFn) (cert *x509.Certificate, key any) {
 	}
 
 	// intended for use when unit testing and as an example of how to emit PEMs
-	const debug = true
+	const debug = false
 	if debug {
 		certPEM := pem.EncodeToMemory(&pem.Block{
 			Type:  "CERTIFICATE",
