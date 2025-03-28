@@ -7,6 +7,7 @@ import (
 
 	"github.com/egustafson/sandbox/go/tls-config-expire/wutil"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -54,8 +55,8 @@ func TestLoadCert(t *testing.T) {
 func TestLoadKey(t *testing.T) {
 
 	key, err := wutil.LoadKeyFromPEM([]byte(testKeyPEM))
-	assert.Nil(t, err)
-	assert.NotNil(t, key)
+	require.Nil(t, err)
+	require.NotNil(t, key)
 
 	k2, err := wutil.LoadKeyFromDER(key.AsDER())
 	assert.Nil(t, err)

@@ -3,6 +3,9 @@ package wutil
 import (
 	"bytes"
 	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -57,11 +60,22 @@ type Key struct {
 }
 
 func LoadKeyFromDER(der []byte) (*Key, error) {
-	if k, err := x509.ParsePKCS8PrivateKey(der); err == nil {
-		return &Key{k: k}, nil
-	} else {
-		return nil, err
+	// Algorithm taken from golang tls module, parsePrivateKey() func.
+	if key, err := x509.ParsePKCS1PrivateKey(der); err == nil {
+		return &Key{k: key}, nil
 	}
+	if key, err := x509.ParsePKCS8PrivateKey(der); err == nil {
+		switch key := key.(type) {
+		case *rsa.PrivateKey, *ecdsa.PrivateKey, ed25519.PrivateKey:
+			return &Key{k: key}, nil
+		default:
+			return nil, errors.New("unknown private key type in PKCS#8 wrapper")
+		}
+	}
+	if key, err := x509.ParseECPrivateKey(der); err == nil {
+		return &Key{k: key}, nil
+	}
+	return nil, errors.New("failed to parse private key")
 }
 
 func LoadKeyFromPEM(pemData []byte) (*Key, error) {
@@ -87,5 +101,5 @@ func (key *Key) AsPEM() []byte {
 }
 
 func (key *Key) AsPrivateKey() crypto.PrivateKey {
-	return &key.k
+	return key.k
 }
