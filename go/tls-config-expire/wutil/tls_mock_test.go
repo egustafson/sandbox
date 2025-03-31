@@ -21,12 +21,12 @@ func TestMakeCertAndKey(t *testing.T) {
 	assert.NotNil(t, key)
 
 	roots := x509.NewCertPool()
-	roots.AddCert(caCert)
+	roots.AddCert(caCert.AsX509Certificate())
 	opts := x509.VerifyOptions{
 		Roots: roots,
 	}
 
-	_, err := cert.Verify(opts)
+	_, err := cert.AsX509Certificate().Verify(opts)
 	assert.Nil(t, err)
 }
 
@@ -43,11 +43,11 @@ func TestMakeCertChain(t *testing.T) {
 			assert.True(t, uint(len(chain)) == l) // default length is 2
 
 			roots := x509.NewCertPool()
-			roots.AddCert(chain.CA().Cert)
+			roots.AddCert(chain.CA().Cert.AsX509Certificate())
 			intermediates := x509.NewCertPool()
 			ii := chain.Intermediates()
 			for _, i := range ii {
-				intermediates.AddCert(i.Cert)
+				intermediates.AddCert(i.Cert.AsX509Certificate())
 			}
 			opts := x509.VerifyOptions{
 				Roots:         roots,
@@ -55,7 +55,7 @@ func TestMakeCertChain(t *testing.T) {
 			}
 
 			leaf := chain.Leaf().Cert
-			_, err := leaf.Verify(opts)
+			_, err := leaf.AsX509Certificate().Verify(opts)
 			assert.Nil(t, err)
 		})
 	}

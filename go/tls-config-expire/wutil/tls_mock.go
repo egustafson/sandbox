@@ -15,7 +15,6 @@ import (
 	crand "crypto/rand"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/pem"
 	"fmt"
 	"math/big"
 	mrand "math/rand/v2"
@@ -28,15 +27,15 @@ import (
 //
 
 type CertKeyPair struct {
-	Cert *x509.Certificate
-	Key  any
+	Cert Cert
+	Key  Key
 }
 
 type CertChain []CertKeyPair
 
 type chainOpts struct {
-	CA                    *x509.Certificate
-	CAkey                 any
+	CA                    Cert
+	CAkey                 Key
 	Length                uint
 	NotAfterVec           []time.Time
 	NotBeforeVec          []time.Time
@@ -66,8 +65,8 @@ func MakeCertChain(opts ...CertChainOptFn) (chain CertChain) {
 		if inconsistent {
 			panic("chain length and not before/after vector lengths are inconsistent")
 		}
-		caStated := co.CA != nil || co.CAkey != nil
-		if caStated && (co.CA == nil || co.CAkey == nil) {
+		caStated := !co.CA.IsNil() || !co.CAkey.IsNil()
+		if caStated && (co.CA.IsNil() || co.CAkey.IsNil()) {
 			panic("both CA cert and CA key must be given, or neither")
 		}
 	}
@@ -108,7 +107,7 @@ func MakeCertChain(opts ...CertChainOptFn) (chain CertChain) {
 	return
 }
 
-func WithCA(caCert *x509.Certificate, caKey any) CertChainOptFn {
+func WithCA(caCert Cert, caKey Key) CertChainOptFn {
 	return func(co *chainOpts) {
 		co.CA = caCert
 		co.CAkey = caKey
@@ -179,7 +178,7 @@ type CertOptFn func(*certProfile)
 // including signing the certificate with a parent certificate.  By default the
 // returned Certificate is self-signed and good for 1 hour before and 1 hour
 // after the current time.
-func MakeCertAndKey(opts ...CertOptFn) (cert *x509.Certificate, key any) {
+func MakeCertAndKey(opts ...CertOptFn) (cert Cert, key Key) {
 
 	sn := big.NewInt(mrand.Int64())
 	template := x509.Certificate{ // define the default Certificate for maximum usability
@@ -221,38 +220,23 @@ func MakeCertAndKey(opts ...CertOptFn) (cert *x509.Certificate, key any) {
 	if err != nil {
 		panic(err)
 	}
-
-	cert, err = x509.ParseCertificate(certBytes)
-	if err != nil {
-		panic(err)
-	}
+	cert = Cert(certBytes) // from x509.go in wutil
+	key = Key{privateKey}  // from x509.go in wutil
 
 	// intended for use when unit testing and as an example of how to emit PEMs
 	const debug = false
 	if debug {
-		certPEM := pem.EncodeToMemory(&pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: certBytes,
-		})
-		privKeyDER, err := x509.MarshalECPrivateKey(privateKey)
-		if err != nil {
-			panic(err)
-		}
-		keyPEM := pem.EncodeToMemory(&pem.Block{
-			Type:  "EC PRIVATE KEY",
-			Bytes: privKeyDER,
-		})
-		fmt.Print(string(certPEM))
-		fmt.Print(string(keyPEM))
+		fmt.Print(string(cert.AsPEM()))
+		fmt.Print(string(key.AsPEM()))
 	} // end debug
 
-	return cert, privateKey
+	return // cert, key
 }
 
-func WithSigner(signer *x509.Certificate, signerKey any) CertOptFn {
+func WithSigner(signer Cert, signerKey Key) CertOptFn {
 	return func(cp *certProfile) {
-		cp.signer = signer
-		cp.signerKey = signerKey
+		cp.signer = signer.AsX509Certificate()
+		cp.signerKey = signerKey.AsPrivateKey()
 	}
 }
 

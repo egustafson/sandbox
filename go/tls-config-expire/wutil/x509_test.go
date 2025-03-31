@@ -66,4 +66,8 @@ func TestLoadKey(t *testing.T) {
 	assert.NotNil(t, pk)
 	_, ok := pk.(*ecdsa.PrivateKey)
 	assert.True(t, ok)
+
+	k3, err := wutil.LoadKeyFromPEM(key.AsPEM())
+	assert.Nil(t, err)
+	assert.NotNil(t, k3)
 }

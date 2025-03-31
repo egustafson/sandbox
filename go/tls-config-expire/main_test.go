@@ -12,7 +12,7 @@ func TestAsTlsConfig(t *testing.T) {
 		DisableTls: true,
 	}
 
-	tlsConfig, err := wutil.MakeTlsConfig(tlsProfile)
+	tlsConfig, err := tlsProfile.TlsConfig()
 	if err != nil {
 		t.FailNow()
 	}

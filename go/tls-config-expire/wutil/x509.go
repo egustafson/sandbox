@@ -18,6 +18,10 @@ import (
 // Cert represents a single X.509 Certificate
 type Cert []byte
 
+func (der Cert) IsNil() bool {
+	return len(der) <= 0
+}
+
 func LoadCertFromDER(der []byte) (Cert, error) {
 	if _, err := x509.ParseCertificate(der); err != nil {
 		// decoded bytes did not parse as a CERTIFICATE
@@ -57,6 +61,10 @@ func (der Cert) AsX509Certificate() *x509.Certificate {
 // Key represents a private Key used as part of X.509 PKI
 type Key struct {
 	k crypto.PrivateKey
+}
+
+func (key *Key) IsNil() bool {
+	return key == nil || key.k == nil
 }
 
 func LoadKeyFromDER(der []byte) (*Key, error) {

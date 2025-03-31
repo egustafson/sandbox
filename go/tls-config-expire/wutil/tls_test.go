@@ -14,29 +14,29 @@ import (
 	"github.com/egustafson/sandbox/go/tls-config-expire/wutil"
 )
 
-func TestAllNotBefore_nil(t *testing.T) {
+func TestTlsProfile_NotBefore_DisableTls(t *testing.T) {
 
 	tlsProfile := &wutil.TlsProfile{DisableTls: true}
-	tlsConfig, err := wutil.MakeTlsConfig(tlsProfile)
+	_, err := tlsProfile.TlsConfig()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
-	_, err = tlsConfig.AllNotBefore()
+	_, err = tlsProfile.NotBefore()
 	if err == nil {
 		t.Fatal("expected error response")
 	}
 }
 
-func TestAllNotAfter_nil(t *testing.T) {
+func TestTlsProfile_NotAfter_DisableTls(t *testing.T) {
 
 	tlsProfile := &wutil.TlsProfile{DisableTls: true}
-	tlsConfig, err := wutil.MakeTlsConfig(tlsProfile)
+	_, err := tlsProfile.TlsConfig()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
-	_, err = tlsConfig.AllNotAfter()
+	_, err = tlsProfile.NotAfter()
 	if err == nil {
 		t.Fatal("expected error response")
 	}
