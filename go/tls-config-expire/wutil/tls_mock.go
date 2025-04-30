@@ -45,8 +45,8 @@ type chainOpts struct {
 type CertChainOptFn func(*chainOpts)
 
 // MakeCertChain will create a chain of signed certificates and return both the
-// certificates and there matching keys.  The last element in the chain is the
-// CA, if provided.
+// certificates and there matching keys.  The first element in the chain is the
+// CA, either provided or generated as a self signed Certificate.
 func MakeCertChain(opts ...CertChainOptFn) (chain CertChain) {
 
 	const defaultLen = 2

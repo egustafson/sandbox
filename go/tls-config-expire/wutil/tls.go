@@ -40,80 +40,72 @@ type TlsProfile struct {
 	// agents should not be validated against the CA and the CA field may be
 	// blank.
 	DisableValidation bool `mapstructure:"disable-validation,omitempty"`
-	// details holds the internal details of the TlsProfile object.
-	details tlsDetails
-}
 
-// tlsDetails holds the hidden, implementation details of the TlsProfile.
-type tlsDetails struct {
-	config *tls.Config
-	lock   sync.RWMutex
-	initAt time.Time
-	// certFilePath will hold the filepath IIF TlsProfile.Cert was initialized with a filepath.
-	certFilePath string
-	// keyFilePath will hold the filepath IIF TlsProfile.Key was initialized with a filepath.
-	keyFilePath string
-	// caFilePath will hold the filepath IIF TlsProfile.CA was initialized with a filepath.
-	caFilePath string
+	cachedTlsConfig *tls.Config
+	lock            sync.RWMutex
+	initAt          time.Time
+	certPEM         string
+	keyPEM          string
+	caPEM           string
 }
 
 // TlsConfig returns a *tls.Config constructed from the public fields of the
 // TlsProfile.  The *tls.Config is only constructed once.  The cached value is
 // returned on subsiquent calls.
 func (profile *TlsProfile) TlsConfig() (*tls.Config, error) {
-	profile.details.lock.RLock()
+	profile.lock.RLock()
 
-	if profile.details.config != nil || profile.DisableTls {
-		defer profile.details.lock.RUnlock()
-		return profile.details.config, nil
+	if profile.cachedTlsConfig != nil || profile.DisableTls {
+		defer profile.lock.RUnlock()
+		return profile.cachedTlsConfig, nil
 	}
 
-	profile.details.lock.RUnlock()
+	profile.lock.RUnlock()
 	return profile.buildTlsConfig()
 }
 
 func (profile *TlsProfile) buildTlsConfig() (*tls.Config, error) {
-	profile.details.lock.Lock()
-	defer profile.details.lock.Unlock()
+	profile.lock.Lock()
+	defer profile.lock.Unlock()
 
-	profile.details.config = &tls.Config{} // initialize with a "nil" configuration
-	profile.details.initAt = time.Now()
+	profile.cachedTlsConfig = &tls.Config{} // initialize with a "nil" configuration
+	profile.initAt = time.Now()
 	if profile.DisableTls {
-		return profile.details.config, nil
+		return profile.cachedTlsConfig, nil
 	}
 
 	// replace file paths with PEM data if necessary
-	if err := profile.normalizeToPEMs(); err != nil { // problem loading files??
+	if err := profile.loadPEMs(); err != nil { // problem loading files??
 		return nil, err
 	}
 
 	// optionally load agent certificate and private key
-	if len(profile.Cert) > 0 {
-		cert, err := tls.X509KeyPair([]byte(profile.Cert), []byte(profile.Key))
+	if len(profile.certPEM) > 0 {
+		cert, err := tls.X509KeyPair([]byte(profile.certPEM), []byte(profile.keyPEM))
 		if err != nil {
 			return nil, err
 		}
 		// 'cert' is a chain of certificates, config.Certificate is a list of chains
-		profile.details.config.Certificates = []tls.Certificate{cert}
+		profile.cachedTlsConfig.Certificates = []tls.Certificate{cert}
 	}
 
 	// optionally load a CA
-	if len(profile.CA) > 0 {
+	if len(profile.caPEM) > 0 {
 		caCertPool := x509.NewCertPool()
-		if !caCertPool.AppendCertsFromPEM([]byte(profile.CA)) {
+		if !caCertPool.AppendCertsFromPEM([]byte(profile.caPEM)) {
 			return nil, errors.New("x509.AppendCertsFromPEM() failed")
 		}
-		profile.details.config.ClientCAs = caCertPool
-		profile.details.config.RootCAs = caCertPool
-		profile.details.config.ClientAuth = tls.RequireAndVerifyClientCert // most restrictive
+		profile.cachedTlsConfig.ClientCAs = caCertPool
+		profile.cachedTlsConfig.RootCAs = caCertPool
+		profile.cachedTlsConfig.ClientAuth = tls.RequireAndVerifyClientCert // most restrictive
 	}
 
 	if profile.DisableValidation {
-		profile.details.config.ClientAuth = tls.NoClientCert // disable client cert validation by server
-		profile.details.config.InsecureSkipVerify = true     // DANGER - turns off all verification, INSECURE
+		profile.cachedTlsConfig.ClientAuth = tls.NoClientCert // disable client cert validation by server
+		profile.cachedTlsConfig.InsecureSkipVerify = true     // DANGER - turns off all verification, INSECURE
 	}
 
-	return profile.details.config, nil
+	return profile.cachedTlsConfig, nil
 }
 
 // NotBefore scans the entire certificate chain, only the first chain, in
@@ -121,14 +113,14 @@ func (profile *TlsProfile) buildTlsConfig() (*tls.Config, error) {
 // value of NotBefore.
 func (profile *TlsProfile) NotBefore() (time.Time, error) {
 	latest := beginningOfTime
-	if profile.details.config == nil {
+	if profile.cachedTlsConfig == nil {
 		if profile.DisableTls {
 			return latest, errors.New("TlsProfile tls disabled")
 		}
 		return latest, errors.New("TlsProfile uninitialized")
 	}
 
-	for _, cert := range profile.details.config.Certificates[0].Certificate {
+	for _, cert := range profile.cachedTlsConfig.Certificates[0].Certificate {
 		x509cert, err := x509.ParseCertificate(cert)
 		if err != nil {
 			return latest, err
@@ -145,14 +137,14 @@ func (profile *TlsProfile) NotBefore() (time.Time, error) {
 // time) value of NotAfter.
 func (profile *TlsProfile) NotAfter() (time.Time, error) {
 	earliest := endOfTime
-	if profile.details.config == nil {
+	if profile.cachedTlsConfig == nil {
 		if profile.DisableTls {
 			return earliest, errors.New("TlsProfile tls disabled")
 		}
 		return earliest, errors.New("TlsProfile uninitialized")
 	}
 
-	for _, cert := range profile.details.config.Certificates[0].Certificate {
+	for _, cert := range profile.cachedTlsConfig.Certificates[0].Certificate {
 		x509cert, err := x509.ParseCertificate(cert)
 		if err != nil {
 			return earliest, err
@@ -164,39 +156,18 @@ func (profile *TlsProfile) NotAfter() (time.Time, error) {
 	return earliest, nil
 }
 
-// normalizeToPEMs will ensure that the public TlsProfile fields (Cert, Key, CA)
-// hold PEM data.  If those fields are initialized with file paths then the file
-// paths will be saved in details.xxxFilePath fields within the details struct.
-func (profile *TlsProfile) normalizeToPEMs() (err error) {
-
-	profile.details.certFilePath = profile.Cert
-	profile.details.keyFilePath = profile.Key
-	profile.details.caFilePath = profile.CA
-
+func (profile *TlsProfile) loadPEMs() (err error) {
 	// Certificate (chain)
-	if profile.Cert, err = convertFilePathToPEM(profile.Cert); err != nil {
+	if profile.certPEM, err = convertFilePathToPEM(profile.Cert); err != nil {
 		return
 	}
-	if profile.details.certFilePath == profile.Cert { // the data was a PEM, not a file path
-		profile.details.certFilePath = ""
-	}
-
 	// Private Key
-	if profile.Key, err = convertFilePathToPEM(profile.Key); err != nil {
+	if profile.keyPEM, err = convertFilePathToPEM(profile.Key); err != nil {
 		return
 	}
-	if profile.details.keyFilePath == profile.Key { // the data was a PEM, not a file path
-		profile.details.keyFilePath = ""
-	}
-
 	// Certificate Authority (bundle)
-	if profile.CA, err = convertFilePathToPEM(profile.CA); err != nil {
-		return
-	}
-	if profile.details.caFilePath == profile.CA { // the data was a PEM, not a file path
-		profile.details.caFilePath = ""
-	}
-	return // profile.{Cert,Key,CA} now has valid PEM material.
+	profile.caPEM, err = convertFilePathToPEM(profile.CA)
+	return // profile.{cert,key,ca}PEM now has valid PEM material, or is empty, or returns error
 }
 
 // convertFilePathToPEM attempts to open `path` and read the contents from the
