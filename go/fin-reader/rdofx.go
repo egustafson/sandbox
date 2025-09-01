@@ -8,10 +8,14 @@ import (
 	ofx "github.com/rockstardevs/goofx"
 )
 
-// const ofxFilename = "samples/qfx/ally-alldates.qfx"
+const ofxFilename = "samples/qfx/capitalone-checking-20230801-20241231.qfx"
+
 // const ofxFilename = "samples/qfx/wells-checking-20230801-20241231.qfx"
 // const ofxFilename = "samples/qfx/citi-mc-20240101-20241231.qfx"
-const ofxFilename = "samples/qfx/wealthfront-savings-20221101-20250105.qfx"
+// const ofxFilename = "samples/qfx/chase-20240101-20241231.qfx"
+
+// const ofxFilename = "samples/qfx/ally-alldates.qfx"
+// const ofxFilename = "samples/qfx/wealthfront-savings-20221101-20250105.qfx"
 
 func rdOFX() {
 

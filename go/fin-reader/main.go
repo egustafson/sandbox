@@ -3,6 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	rdOFX()
+	//rdOFX()
+	rdOFXGO()
 	fmt.Println("done.")
 }
