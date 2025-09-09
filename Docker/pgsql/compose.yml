@@ -2,8 +2,7 @@
 services:
 
   postgresql:
-    user: "1000:1000"  # user: ericg
-    image: postgres:17-bookworm
+    image: postgres:17
     restart: always
     # set shared memory limit when using docker-compose
     shm_size: 128mb
@@ -14,5 +13,5 @@ services:
         source: ./pgdata              # <-- must be CREATED
         target: /var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: demo
+      POSTGRES_PASSWORD: dev
 ...
