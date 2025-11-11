@@ -20,7 +20,8 @@ func onDisconnect(client mqtt.Client, err error) {
 }
 
 const (
-	broker    = "tcp://localhost:1883"
+	//	broker    = "tcp://localhost:1883"
+	broker    = "tcp://10.3.4.11:1883"
 	client_id = "sandbox-test-client"
 	topic     = "#"
 	qos       = 1
@@ -44,7 +45,7 @@ func main() {
 	token.Wait()
 	fmt.Printf("subscribed to topic: %s\n", topic)
 
-	time.Sleep(1 * time.Minute)
+	time.Sleep(24 * time.Hour)
 	client.Disconnect(100) // linger 100ms before closing
 	fmt.Println("done.")
 }
