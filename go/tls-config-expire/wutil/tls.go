@@ -12,11 +12,6 @@ import (
 	_ "github.com/go-viper/mapstructure/v2"
 )
 
-var (
-	beginningOfTime = time.Date(0000, 1, 1, 1, 0, 0, 0, time.UTC)      // impossibly far in the past
-	endOfTime       = time.Date(9999, 12, 31, 23, 59, 59, 9, time.UTC) // impossibly far in the future
-)
-
 // TlsProfile holds the raw input used to build a TlsConfig, (which is an
 // extension of a crypto/tls.Config).
 type TlsProfile struct {
