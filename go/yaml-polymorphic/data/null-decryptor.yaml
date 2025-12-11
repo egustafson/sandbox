@@ -1,0 +1,4 @@
+---
+id: null-decryptor
+decryptor:
+  type: null-decryptor

@@ -1,0 +1,6 @@
+---
+id: passwd-decryptor
+decryptor:
+  type: password-decryptor
+  password: "s3cr3t"
+  

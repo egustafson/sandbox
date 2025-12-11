@@ -1,0 +1,6 @@
+---
+id: yubikey-decryptor
+decryptor:
+  type: yubikey-decryptor
+  slot: 1
+  pin: "654321"
