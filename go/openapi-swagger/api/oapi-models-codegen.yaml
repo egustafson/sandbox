@@ -1,0 +1,10 @@
+---
+# oapi-codegen for model types code generation
+
+# yaml-language-server: $schema=../openapi.yaml
+package: api
+generate:
+  models: true
+output: api-models.gen.go
+output-options:
+  prefer-skip-optional-pointer: true

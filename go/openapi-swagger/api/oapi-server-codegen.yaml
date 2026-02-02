@@ -1,0 +1,9 @@
+---
+# oapi-codegen for server and swagger code generation
+
+# yaml-language-server: $schema=../openapi.yaml
+package: api
+generate:
+  gin-server: true
+  embedded-spec: true
+output: api-server.gen.go

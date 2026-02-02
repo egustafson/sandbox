@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Example API
+  description: This is a sample OpenAPI specification for an example API that manages items.
+  contact:
+    name: Demo Sandbox Support
+    url: http://www.example.com/support
+    email: nobody@example.org
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+servers:
+  - url: /api 
+    description: api server prefix
+
+paths:
+
+  /items:
+    get:
+      summary: Retrieve a list of items
+      responses:
+        '200':
+          description: A list of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: Create a new item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          $ref: '#/components/responses/ItemResponse'
+
+  /items/{itemID}:
+    get:
+      summary: Retrieve a specific item by ID
+      parameters:
+        - name: itemID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete a specific item by ID
+      parameters:
+        - name: itemID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          $ref: '#/components/responses/ItemResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        value:
+          type: integer
+      required:
+        - id
+        - value
+
+  responses:
+    ItemResponse:
+      description: A single item response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Item'
+
+    NotFound:
+      description: The specified item was not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              message:
+                type: string
+                example: Item not found
