@@ -19,6 +19,6 @@ RUN make build
 FROM debian:trixie-slim
 
 WORKDIR /app
-COPY --from=builder /workspace/dist/kubernetes-version /app/kubernetes-version
+COPY --from=builder /workspace/dist/kubever /app/kubever
 EXPOSE 8080/tcp
-CMD [ "/app/kubernetes-version" ]
+CMD [ "/app/kubever" ]
